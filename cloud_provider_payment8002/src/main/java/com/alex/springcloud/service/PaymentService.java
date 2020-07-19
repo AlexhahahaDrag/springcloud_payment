@@ -21,7 +21,7 @@ public class PaymentService {
         if (payment == null)
             return new CommonResult<>(423, "id为" + id + "的单据不存在");
         else
-            return new CommonResult<>(200, "查询成功, port" + port , payment);
+            return new CommonResult<>(200, "查询成功, port" + port, payment);
     }
 
     public CommonResult<Integer> createPayment(Payment payment) {

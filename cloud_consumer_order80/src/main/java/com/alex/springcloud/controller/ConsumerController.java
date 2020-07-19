@@ -14,7 +14,14 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/consumer")
 public class ConsumerController {
 
-    private static final String PROVIDE_URL = "http://localhost:8001/payment";
+    /**
+     * description :负载均衡的时候cloud-provider-payment不能是_
+     * author :     alex
+     * @param :
+     * @return :
+     */
+
+    private static final String PROVIDE_URL = "http://CLOUD-PROVIDER-PAYMENT";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -22,11 +29,11 @@ public class ConsumerController {
     @RequestMapping("/get/{id}")
     public CommonResult<Payment> getPayment(@PathVariable("id") Long id) {
         String url = PROVIDE_URL + "/get/" + id;
-        return restTemplate.getForObject(PROVIDE_URL + "/get/" + id, CommonResult.class);
+        return restTemplate.getForObject(PROVIDE_URL + "/payment/get/" + id, CommonResult.class);
     }
 
     @RequestMapping("create")
     public CommonResult<Integer> createPayment(Payment payment) {
-        return restTemplate.postForObject(PROVIDE_URL + "/create", payment, CommonResult.class);
+        return restTemplate.postForObject(PROVIDE_URL + "/payment/create", payment, CommonResult.class);
     }
 }

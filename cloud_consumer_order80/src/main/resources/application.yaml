@@ -3,4 +3,14 @@ server:
 
 spring:
   application:
-    name: cloud_consumer_order_80
+    name: cloud-consumer-order
+
+eureka:
+  client:
+    register-with-eureka: true  #true表示将自己注册到eurekaserivce注册中心
+    fetch-registry: true        #true表示从eureka service抓取已有的注册信息
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
+  instance:
+    instance-id: consumer80
+    prefer-ip-address: true
