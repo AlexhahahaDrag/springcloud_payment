@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-//@RequestMapping("/payment")
+@RequestMapping("/payment")
 public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
 
-    @RequestMapping("/payment/get/{id}")
+    @RequestMapping("/get/{id}")
     public CommonResult<Payment> getPayment(@PathVariable(value = "id") Long id) {
         return paymentService.getPayment(id);
     }
 
-    @PostMapping("/payment/create")
+    @PostMapping("/create")
     public CommonResult<Integer> createPayment(@RequestBody Payment payment) {
         return paymentService.createPayment(payment);
     }
