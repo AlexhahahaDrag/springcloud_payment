@@ -25,6 +25,7 @@
         <module>cloud_consumer_feign_order80</module>
         <module>cloud_provider_payment8009_hystrix</module>
         <module>cloud_consumer_feign_hystrix_order80</module>
+        <module>cloud_provider_payment8010_hystrix</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
