@@ -27,6 +27,7 @@
         <module>cloud_provider_payment8010_hystrix</module>
         <module>cloud_provider_payment9001_hystrix_dashboard</module>
         <module>cloud_provider_payment8011_hystrix</module>
+        <module>cloud_gateway9500</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
