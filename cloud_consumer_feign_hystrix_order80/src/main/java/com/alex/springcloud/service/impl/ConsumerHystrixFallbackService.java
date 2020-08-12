@@ -16,6 +16,6 @@ public class ConsumerHystrixFallbackService implements ConsumerHystrixService {
 
     @Override
     public CommonResult<Payment> getPaymentTimeOut(Long id) {
-        return new CommonResult<>(423, "线程池:  " + Thread.currentThread().getName() + "  80系统繁忙或者运行报错，请稍后再试,id:  "+id+"\t"+"o(╥﹏╥)o");
+        return new CommonResult<>(423, "线程池:  " + Thread.currentThread().getName() + "  80timeOut系统繁忙或者运行报错，请稍后再试,id:  "+id+"\t"+"o(╥﹏╥)o");
     }
 }

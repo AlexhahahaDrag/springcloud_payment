@@ -16,17 +16,12 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public CommonResult<Payment> getPayment(@PathVariable(value = "id") Long id) {
-        try {
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public CommonResult<Payment> getPayment(@PathVariable(value = "id") Long id) throws Exception {
         return paymentService.getPayment(id);
     }
 
     @RequestMapping(value = "/getTimeOut/{id}", method = RequestMethod.GET)
-    public CommonResult<Payment> getPaymentTimeOut(@PathVariable(value = "id") Long id) {
+    public CommonResult<Payment> getPaymentTimeOut(@PathVariable(value = "id") Long id) throws Exception {
         try {
 
         } catch (Exception e) {

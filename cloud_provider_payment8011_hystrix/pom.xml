@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cloud_provider_payment8009_hystrix</artifactId>
+    <artifactId>cloud_provider_payment8011_hystrix</artifactId>
 
     <dependencies>
         <!--eureka-client-->
@@ -34,16 +34,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
         </dependency>
-        <!-- &lt;!&ndash;eureka-client&ndash;&gt;
-         <dependency>
-             <groupId>org.springframework.cloud</groupId>
-             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-         </dependency>-->
-        <!--   <dependency>&lt;!&ndash; 引入自己定义的api通用包，可以使用Payment支付Entity &ndash;&gt;
-               <groupId>com.atguigu.springcloud</groupId>
-               <artifactId>cloud-api-commons</artifactId>
-               <version>${project.version}</version>
-           </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

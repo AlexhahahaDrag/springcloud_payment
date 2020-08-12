@@ -1,5 +1,5 @@
 server:
-  port: 8009
+  port: 8011
 
 spring:
   application:
@@ -19,7 +19,7 @@ eureka:
       defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/
   instance:
     prefer-ip-address: true
-    instance-id: payment8009
+    instance-id: payment8011
 
 mybatis:
   mapperLocations: classpath:mapper/*.xml

@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableCircuitBreaker
-public class PaymentHystrixMain8010 {
+public class PaymentHystrixMain8011 {
 
     public static void main(String[] args) {
-        SpringApplication.run(PaymentHystrixMain8010.class, args);
+        SpringApplication.run(PaymentHystrixMain8011.class, args);
     }
 
     /**
