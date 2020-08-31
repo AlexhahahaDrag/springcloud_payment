@@ -1,4 +1,4 @@
-package com.alex.springboot;
+package com.alex.springcloud;
 
 
 import org.springframework.boot.SpringApplication;
