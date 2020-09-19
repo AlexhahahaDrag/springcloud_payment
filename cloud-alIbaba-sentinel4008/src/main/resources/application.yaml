@@ -1,0 +1,22 @@
+server:
+  port: 4008
+
+spring:
+  application:
+    name: cloud-alibaba-sentinel-cilent
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    sentinel:
+      transport:
+        #配置sentinel dashboard地址
+        dashboard: localhost:8849
+        #默认端口8719，如果被占用自动从8719+1直到找到未被占用的接口
+        port: 8719
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
