@@ -30,11 +30,14 @@
         <module>cloud_gateway9500</module>
         <module>cloud_config_server3344</module>
         <module>cloud-alibaba-nacos-payment9001</module>
-        <module>cloud-alibaba-nacos-payment9002</module>
         <module>cloud-alibaba-nacos-payment9003</module>
         <module>cloud-alibaba-nacos-order81</module>
         <module>cloud-alibaba-nacos-config3377</module>
         <module>cloud-alIbaba-sentinel4008</module>
+        <module>cloud-alibaba-nacos-payment9005</module>
+        <module>cloud-alibaba-nacos-order4800</module>
+        <module>cloud-alibaba-nacos-payment9004</module>
+        <module>cloud-alibaba-nacos-api</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
