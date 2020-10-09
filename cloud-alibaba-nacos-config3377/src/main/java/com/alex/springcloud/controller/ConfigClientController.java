@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RefreshScope//nacos支持动态刷新
 public class ConfigClientController {
 
-    @Value("${config.info}")
-    private String info;
+//    @Value("${config.info}")
+//    private String info;
 
     @GetMapping("/config/info")
     public String getConfigInfo() {
-        return info;
+        return "111";
     }
 }
