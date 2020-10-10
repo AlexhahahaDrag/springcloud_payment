@@ -6,52 +6,13 @@ spring:
   cloud:
     alibaba:
       seata:
-        # 自定义事务组名称需要与seata-server中的对应
-        tx-service-group: fsp_tx_group
+        tx-service-group: my_test_tx_group
     nacos:
       discovery:
         server-addr: localhost:8848
+        namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
       config:
         server-addr: localhost:8848
         file-extension: yaml
-        group: test_group
+        group: SEATA_GROUP
         namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
-
-#seata配置
-seata:
-  enabled: true
-  # 起个当前服务的seata名字
-  application-id: springcloud-order-service
-  #这里的名字与file.conf中vgroup_mapping.my_test_tx_group = "default"相同
-  tx-service-group: fsz_group
-  enable-auto-data-source-proxy: true
-  #  use-jdk-proxy: false
-  service:
-    #这里的名字与file.conf中vgroup_mapping.my_test_tx_group = "default"相同
-    vgroup-mapping:
-      fsz_group: default
-      #这里的名字与file.conf中default.grouplist = "127.0.0.1:8091"相同
-    grouplist:
-      default: 127.0.0.1:8091
-  #      disable-global-transaction: false
-  config:
-    type: nacos
-    nacos:
-      namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
-      #这里的地址就是你的nacos的地址,可以更换为线上
-      serverAddr: localhost:8848
-      #这里的名字就是registry.conf中 nacos的group名字
-      group: SEATA_GROUP
-      userName: "nacos"
-      password: "nacos"
-  registry:
-    type: nacos
-    nacos:
-      application: seata-server
-      #这里的地址就是你的nacos的地址,可以更换为线上
-      server-addr: localhost:8848
-      #这里的名字就是registry.conf中 nacos的group名字
-      group: SEATA_GROUP
-      namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
-      userName: "nacos"
-      password: "nacos"
