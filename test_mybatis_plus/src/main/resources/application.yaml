@@ -1,0 +1,28 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: test_mybatis_plus
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
+    driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包
+    url: jdbc:mysql://localhost:3306/db2019?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: mysql
+
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+  type-aliases-package: com.alex.springcloud.entities   # 所有Entity别名类所在包
+
+mybatis-plus:
+  global-config:
+    db-config:
+      #驼峰下划线转换
+      db-column-underline: true
+      logic-delete-value: 0 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 1 # 逻辑未删除值(默认为 0)
+
+logging:
+  level:
+    com.alex.springcloud.dao: debug
