@@ -38,6 +38,9 @@
         <module>cloud-alibaba-nacos-order4800</module>
         <module>cloud-alibaba-nacos-payment9004</module>
         <module>cloud-alibaba-nacos-api</module>
+        <module>springcloud-order-service2001</module>
+        <module>springcloud-storage-service2002</module>
+        <module>springcloud-account-service2003</module>
         <module>test_mybatis_plus</module>
     </modules>
 

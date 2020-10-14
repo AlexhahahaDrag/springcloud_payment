@@ -1,0 +1,18 @@
+server:
+  port: 2001
+spring:
+  application:
+    name: springcloud-order-service
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: my_test_tx_group
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+        group: SEATA_GROUP
+        namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad

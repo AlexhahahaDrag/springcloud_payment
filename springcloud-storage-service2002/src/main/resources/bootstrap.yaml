@@ -1,0 +1,42 @@
+server:
+  port: 2002
+
+spring:
+  application:
+    name: springcloud-storage-service
+  cloud:
+#    alibaba:
+#      seata:
+#        tx-service-group: my_test_tx_group
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+        group: test_group
+        namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
+
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: ${spring.application.name}_group
+  enable-auto-data-source-proxy: true
+  config:
+    type: nacos
+    nacos:
+      namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
+      serverAddr: localhost:8848
+      group: DEFAULT_GROUP
+      userName: "nacos"
+      password: "nacos"
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: localhost:8848
+      namespace: 6d36acfd-f583-47dd-ad31-a2f8fdd45cad
+      userName: "nacos"
+      password: "nacos"
