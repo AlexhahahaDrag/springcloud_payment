@@ -1,0 +1,9 @@
+server:
+  port: 8888
+  thymeleaf:
+    cache: false
+
+elasticsearch:
+  host: localhost
+  port: 9200
+  scheme: http
