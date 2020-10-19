@@ -15,6 +15,13 @@ public class ElatsticsearchTest {
     private RestHighLevelClient restHighLevelClient;
 
     @Test
+    public void elsticsearchCreateIndiceTest() {
+        ElasticsearchUtil elasticsearchUtil = new ElasticsearchUtil(restHighLevelClient);
+        Content content = new Content("111", "12", "2");
+        elasticsearchUtil.createIndex("test1");
+    }
+
+    @Test
     public void elsticsearchCreateDocumentTest() {
         ElasticsearchUtil elasticsearchUtil = new ElasticsearchUtil(restHighLevelClient);
         Content content = new Content("111", "12", "2");

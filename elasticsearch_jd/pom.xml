@@ -12,7 +12,8 @@
     <artifactId>elasticsearch_jd</artifactId>
 
     <properties>
-        <elasticsearch.version>${elasticsearch.version}</elasticsearch.version>
+        <java.version>1.8</java.version>
+        <elasticsearch.version>7.9.2</elasticsearch.version>
     </properties>
 
     <dependencies>
