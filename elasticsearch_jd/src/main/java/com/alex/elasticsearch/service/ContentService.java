@@ -9,15 +9,24 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.query.HighlightQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +53,7 @@ public class ContentService {
         List<Content> contentList = HtmlParseUtil.parseJD(keyword);
         //将内容转换成json
         List<JSONObject> res = contentList.stream().map(JSONUtil::parseObj).collect(Collectors.toList());
+        System.out.println(res);
         //如果索引不存在，就创建一个新的索引
         if (!elasticsearchUtil.indexExists(indexName))
             elasticsearchUtil.createIndex(indexName);
@@ -62,12 +72,26 @@ public class ContentService {
         //设置分页
         searchSourceBuilder.from(pageNo * pageSize);
         searchSourceBuilder.size(pageSize);
+        //设置高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.preTags("<span class='key' style='color:red'>");
+        highlightBuilder.postTags("</span>");
+        highlightBuilder.field("name");
+        searchSourceBuilder.highlighter(highlightBuilder);
         //设置查询
-        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", keyword);
+        MatchQueryBuilder termQueryBuilder = QueryBuilders.matchQuery("name", keyword);
         searchSourceBuilder.query(termQueryBuilder);
         searchRequest.source(searchSourceBuilder);
         SearchResponse search = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        SearchHits hits = search.getHits();
-        return null;
+        SearchHit[] hitsArray = search.getHits().getHits();
+        List<Content> res = new ArrayList<>();
+        for (SearchHit hit : hitsArray) {
+            Content content = JSONUtil.toBean(hit.getSourceAsString(), Content.class);
+            HighlightField name = hit.getHighlightFields().get("name");
+            System.out.println(name.getFragments()[0]);
+            content.setName(name.getFragments()[0].string());
+            res.add(content);
+        }
+        return res;
     }
 }

@@ -220,7 +220,7 @@ public class ElasticsearchUtil {
         bulkRequest.timeout(TimeValue.timeValueSeconds(3));
         AtomicInteger index = new AtomicInteger(1);
         list.forEach(jsonObject -> {
-            bulkRequest.add(new IndexRequest(indexName).id(String.valueOf(index.getAndIncrement())).source(XContentType.JSON, "field", jsonObject));
+            bulkRequest.add(new IndexRequest(indexName).id(String.valueOf(index.getAndIncrement())).source(jsonObject, XContentType.JSON));
         });
         try {
             log.info("索引{}批量插入文档数据{}", indexName, list);
