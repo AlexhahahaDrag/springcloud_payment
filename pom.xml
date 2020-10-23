@@ -43,6 +43,7 @@
         <module>springcloud-account-service2003</module>
         <module>test_mybatis_plus</module>
         <module>elasticsearch_jd</module>
+        <module>docker_test</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
