@@ -1,6 +1,7 @@
 package com.alex.elasticsearch.utils;
 
 import com.alex.elasticsearch.entity.Content;
+import com.alex.elasticsearch.entity.Info;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,8 +30,30 @@ public class HtmlParseUtil {
         return list;
     }
 
+    public static List<Info> parseCamel(String keyword) throws IOException {
+        String url = "https://camel.apache.org/components/latest/" + keyword + "-component.html";
+        Document document = Jsoup.parse(new URL(new String(url.getBytes(), "utf-8")), 3000);
+        Elements content1 = document.getElementsByClass("sect2");
+        Element element1 = content1.get(1);
+        Elements tr = element1.getElementsByTag("tr");
+        List<Info> list = new ArrayList<>();
+        for (Element element : tr) {
+            Elements td = element.getElementsByTag("td");
+            if (td != null && td.size() > 0) {
+                Info info = new Info();
+                info.setName(td.get(0).text());
+                info.setDescription(td.get(1).text());
+                info.setDefaultv(td.get(2).text());
+                info.setType(td.get(3).text());
+                list.add(info);
+            }
+        }
+        return list;
+    }
+
     public static void main(String[] args) throws IOException {
-        List<Content> contents = HtmlParseUtil.parseJD("vue");
+        List<Info> contents = HtmlParseUtil.parseCamel("");
+        //List<Content> contents = HtmlParseUtil.parseJD("vue");
         contents.forEach(System.out::println);
     }
 }
