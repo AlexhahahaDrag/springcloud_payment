@@ -44,6 +44,7 @@
         <module>test_mybatis_plus</module>
         <module>elasticsearch_jd</module>
         <module>docker_test</module>
+        <module>cloud_rabbitmq9010</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
@@ -60,6 +61,7 @@
         <project.version>1.0-SNAPSHOT</project.version>
         <elasticsearch.version>7.9.2</elasticsearch.version>
         <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
+        <nacos.config.version>2.2.0.RELEASE</nacos.config.version>
     </properties>
 
     <parent>
@@ -92,7 +94,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2.2.1.RELEASE</version>
+                <version>2.2.3.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
