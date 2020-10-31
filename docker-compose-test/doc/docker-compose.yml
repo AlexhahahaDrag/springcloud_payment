@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    depends_on:
+      - redis
+    ports:
+      - 9000:9000
+  redis:
+    image: redis
+    ports:
+    - 6379:6379

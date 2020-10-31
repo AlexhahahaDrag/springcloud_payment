@@ -1,0 +1,8 @@
+server:
+  port: 9000
+spring:
+  application:
+    name: test_docker
+  redis:
+    host: redis
+    port: 6379
