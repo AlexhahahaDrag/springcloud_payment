@@ -46,6 +46,7 @@
         <module>docker_test</module>
         <module>cloud_rabbitmq9010</module>
         <module>docker-compose-test</module>
+        <module>aliyun_maxcompute</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
