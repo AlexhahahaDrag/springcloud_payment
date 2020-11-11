@@ -1,6 +1,6 @@
 package com.alex.springcloud.controller;
 
-import com.alex.springcloud.dao.UserMapper;
+import com.alex.springcloud.mapper.UserMapper;
 import com.alex.springcloud.entity.User;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.beans.factory.annotation.Autowired;

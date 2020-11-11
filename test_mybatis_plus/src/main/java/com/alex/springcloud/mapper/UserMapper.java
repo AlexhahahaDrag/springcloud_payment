@@ -1,4 +1,4 @@
-package com.alex.springcloud.dao;
+package com.alex.springcloud.mapper;
 
 import com.alex.springcloud.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
