@@ -9,8 +9,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.bytebuddy.utility.JavaType;
-import org.apache.ibatis.type.JdbcType;
 
 @Data
 @AllArgsConstructor
@@ -31,9 +29,17 @@ public class SqlInfo {
     @TableField(value = "table_name")
     private String tableName;
 
-    @ApiModelProperty(value = "sqlText", name = "sql信息", example = "1")
-    @TableField(value = "sql_text")
-    private String sqlText;
+    @ApiModelProperty(value = "tableNameCn", name = "表中文名", example = "ods_表")
+    @TableField(value = "table_name_cn")
+    private String tableNameCn;
+
+    @ApiModelProperty(value = "sqlMc", name = "maxCompute sql", example = "1")
+    @TableField(value = "sql_mc")
+    private String sqlMc;
+
+    @ApiModelProperty(value = "sqlMysql", name = "mysql sql", example = "1")
+    @TableField(value = "sql_mysql")
+    private String sqlMysql;
 
 //    @ApiModelProperty(value = "isMust", name = "是否必填", example = "是")
 //    @TableField(value = "is_must")

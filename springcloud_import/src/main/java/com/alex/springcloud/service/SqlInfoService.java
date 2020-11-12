@@ -16,10 +16,11 @@ import java.util.*;
 @Service
 public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
 
-    public boolean importInfo(String type, MultipartFile file, Integer index) throws Exception {
+    public List<SqlInfo> importInfo(String type, MultipartFile file, Integer index) throws Exception {
         List<SqlInfo> sqlInfos = importSql(file, type, index);
-        this.saveBatch(sqlInfos);
-        return true;
+        if (sqlInfos != null && sqlInfos.size() > 0)
+            this.saveBatch(sqlInfos);
+        return sqlInfos;
     }
 
     private List<SqlInfo> importSql(MultipartFile file, String type, Integer index) throws Exception {
@@ -43,13 +44,16 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
             importParams.setStartSheetIndex(index);
             result = ExcelImportUtil.importExcelMore(file.getInputStream(), SqlInfoImport.class, importParams);
             sheets =  result.getWorkbook().getNumberOfSheets();
-            if (result != null) {
+            if (result != null && result.getList() != null && result.getList().size() > 0) {
                 SqlInfo sqlInfo = new SqlInfo();
                 sqlInfo.setType(type);
-                String tableName = result.getWorkbook().getSheetName(index);
+                String tableName = result.getList().get(0).getTableName();
+                String tableNameCn = result.getWorkbook().getSheetName(index);
                 sqlInfo.setTableName(tableName);
+                sqlInfo.setTableNameCn(tableNameCn);
                 sqlInfo.setVersion(version);
-                sqlInfo.setSqlText(getSql(result.getList(), tableName));
+                sqlInfo.setSqlMc(getSql(result.getList(), tableName, tableNameCn));
+                sqlInfo.setSqlMysql(setSqlMysql(result.getList(), tableName, tableNameCn));
                 list.add(sqlInfo);
             }
             index++;
@@ -57,19 +61,35 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
         return list;
     }
 
-    private String getSql(List<SqlInfoImport> list, String tableName) {
+    private String setSqlMysql(List<SqlInfoImport> list, String tableName, String tableNameCn) {
         if (list == null || list.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("CREATE TABLE IF NOT EXISTS `");
-        stringBuilder.append(list.get(0).getTableName() +"` (");
+        stringBuilder.append(tableName +"` (");
         for (SqlInfoImport sqlInfoImport : list) {
             stringBuilder.append("`" + sqlInfoImport.getColumn() + "` ");
-            stringBuilder.append(sqlInfoImport.getColumnType() == null ? "String" : sqlInfoImport.getColumnType());
+            stringBuilder.append(sqlInfoImport.getColumnType() == null ? "string" : sqlInfoImport.getColumnType());
             stringBuilder.append(" COMMENT '" + sqlInfoImport.getColumnName() + "',");
         }
         stringBuilder.replace(stringBuilder.length() - 1, stringBuilder.length(), "");
-        stringBuilder.append(") COMMENT '" + tableName + "'");
+        stringBuilder.append(") COMMENT = '" + tableNameCn + "';");
+        return stringBuilder.toString();
+    }
+
+    private String getSql(List<SqlInfoImport> list, String tableName, String tableNameCn) {
+        if (list == null || list.size() == 0)
+            return "";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE TABLE IF NOT EXISTS `");
+        stringBuilder.append(tableName +"` (");
+        for (SqlInfoImport sqlInfoImport : list) {
+            stringBuilder.append("`" + sqlInfoImport.getColumn() + "` ");
+            stringBuilder.append(sqlInfoImport.getColumnType() == null ? "string" : sqlInfoImport.getColumnType());
+            stringBuilder.append(" COMMENT '" + sqlInfoImport.getColumnName() + "',");
+        }
+        stringBuilder.replace(stringBuilder.length() - 1, stringBuilder.length(), "");
+        stringBuilder.append(") COMMENT '" + tableNameCn + "'");
         stringBuilder.append(" PARTITIONED BY (ds string COMMENT '业务日期');");
         return stringBuilder.toString();
     }

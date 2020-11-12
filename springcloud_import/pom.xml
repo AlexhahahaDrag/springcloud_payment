@@ -11,6 +11,13 @@
 
     <artifactId>springcloud_imoport</artifactId>
 
+    <properties>
+        <swagger.version>2.10.5</swagger.version>
+        <easypoi.version>4.2.0</easypoi.version>
+        <mybatisplus.version>3.4.0</mybatisplus.version>
+        <druid.version>1.2.3</druid.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -20,12 +27,12 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>1.1.10</version>
+            <version>${druid.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.0.31</version>
+            <version>${druid.version}</version>
         </dependency>
         <!--mysql-connector-java-->
         <dependency>
@@ -35,23 +42,23 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.4.0</version>
+            <version>${mybatisplus.version}</version>
         </dependency>
         <!--swagger-->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.10.5</version>
+            <version>${swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.10.5</version>
+            <version>${swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-spring-webmvc</artifactId>
-            <version>2.10.5</version>
+            <version>${swagger.version}</version>
         </dependency>
         <!--web-->
         <dependency>
@@ -62,17 +69,17 @@
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-base</artifactId>
-            <version>4.2.0</version>
+            <version>${easypoi.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-web</artifactId>
-            <version>4.2.0</version>
+            <version>${easypoi.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-annotation</artifactId>
-            <version>4.2.0</version>
+            <version>${easypoi.version}</version>
         </dependency>
     </dependencies>
 </project>

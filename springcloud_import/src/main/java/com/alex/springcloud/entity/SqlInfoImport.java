@@ -21,6 +21,7 @@ public class SqlInfoImport {
     @Excel(name = "ODS标准层表字段中文名")
     private String columnName;
 
+    @Excel(name = "字段类型")
     private String columnType;
 
     @Excel(name = "是否必填")
