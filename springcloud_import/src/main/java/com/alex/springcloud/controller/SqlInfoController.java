@@ -25,10 +25,9 @@ public class SqlInfoController {
 
     @ApiOperation(value = "客户信息批量导入", httpMethod = "POST", notes = "客户信息批量导入", produces = "application/json; charset=utf-8")
     @PostMapping("/import")
-    public List<SqlInfo> importItemDetail(@ApiParam(value = "type", required = true) @RequestParam(value = "type") String type,
-                                          @ApiParam(value = "file", required = true) @RequestBody MultipartFile file,
+    public List<SqlInfo> importItemDetail(@ApiParam(value = "file", required = true) @RequestBody MultipartFile file,
                                           @ApiParam(value = "startSheet", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
-                                          @ApiParam(value = "isFact", required = true) @RequestParam(name="isFact") String isFact) throws Exception {
-        return sqlInfoService.importInfo(type, file, startSheet, isFact);
+                                          @ApiParam(value = "是否是拉链表，不填时默认都是拉链表", defaultValue = "[]", example = "[1,0](1:是, 0:否)") @RequestParam(value = "isZipper", required = false) Integer... isZipper) throws Exception {
+        return sqlInfoService.importInfo(file, startSheet, isZipper);
     }
 }

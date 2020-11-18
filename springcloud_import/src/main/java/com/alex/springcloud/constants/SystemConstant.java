@@ -1,6 +1,12 @@
 package com.alex.springcloud.constants;
 
+import com.alex.springcloud.enums.AddFieldEnum;
+import com.alex.springcloud.enums.CommonFieldEnum;
+import com.alex.springcloud.enums.ZipperFieldEnum;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -12,25 +18,21 @@ import java.util.Set;
 public class SystemConstant {
 
     //字段常量
-    //拉链表不包含字段
-    public static Set<String> ZIPPER_TABLE = new HashSet<>();
+    //拉链表包含字段
+    public static Map<String, String> DWD_COMMON_TABLE = new HashMap<>();
 
-    public static String S_START_TIME = "s_start_time";
+    //dwd拉链表包含字段
+    public static Map<String, String> DWD_ZIPPER_TABLE = new HashMap<>();
 
-    public static String S_END_TIME = "s_end_time";
-
-    public static String S_STAT = "s_stat";
-
-    public static String S_ACTION = "s_action";
-
-    //增量表不包含字段
-    public static Set<String> ADD_TABLE = new HashSet<>();
+    //dwd增量表包含字段
+    public static Map<String, String> DWD_ADD_TABLE = new HashMap<>();
 
     static {
-        ADD_TABLE.add(S_START_TIME);
-        ADD_TABLE.add(S_END_TIME);
-        ADD_TABLE.add(S_STAT);
-        ZIPPER_TABLE.add(S_ACTION);
+        DWD_COMMON_TABLE.put(CommonFieldEnum.S_SRC.getCode(), CommonFieldEnum.S_SRC.getComment());
+        DWD_ADD_TABLE.put(AddFieldEnum.S_ACTION.getCode(), AddFieldEnum.S_ACTION.getComment());
+        DWD_ZIPPER_TABLE.put(ZipperFieldEnum.S_STAT.getCode(), ZipperFieldEnum.S_STAT.getComment());
+        DWD_ZIPPER_TABLE.put(ZipperFieldEnum.S_START_TIME.getCode(), ZipperFieldEnum.S_START_TIME.getComment());
+        DWD_ZIPPER_TABLE.put(ZipperFieldEnum.S_END_TIME.getCode(), ZipperFieldEnum.S_END_TIME.getComment());
     }
 
     //sql常量
@@ -52,4 +54,12 @@ public class SystemConstant {
     public static final String ADD_CN = "增量";
 
     public static final String FULL_CN = "全量";
+
+    public static final String ODS = "ods";
+
+    public static final String DWD = "dwd";
+
+    public static final String DWS = "dws";
+
+    public static final String ADS = "ads";
 }
