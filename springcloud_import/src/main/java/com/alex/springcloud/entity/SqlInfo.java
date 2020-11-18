@@ -33,14 +33,25 @@ public class SqlInfo {
     @TableField(value = "table_name_cn")
     private String tableNameCn;
 
-    @ApiModelProperty(value = "sqlMc", name = "maxCompute sql", example = "1")
-    @TableField(value = "sql_mc")
-    private String sqlMc;
+    @ApiModelProperty(value = "sqlZipper", name = "拉链表sql", example = "1")
+    @TableField(value = "sql_zipper")
+    private String sqlZipper;
 
-    @ApiModelProperty(value = "sqlMysql", name = "mysql sql", example = "1")
-    @TableField(value = "sql_mysql")
-    private String sqlMysql;
+    @ApiModelProperty(value = "sqlAdd", name = "增量表sql", example = "1")
+    @TableField(value = "sql_add")
+    private String sqlAdd;
 
+    @ApiModelProperty(value = "isFact", name = "是否是事实表1:是 0:否", example = "1")
+    @TableField(value = "is_fact")
+    private String isFact;
+
+    @ApiModelProperty(value = "sqlAddMysql", name = "mysql add sql", example = "1")
+    @TableField(value = "sql_add_mysql")
+    private String sqlAddMysql;
+
+    @ApiModelProperty(value = "sqlZipperMysql", name = "mysql zipper sql", example = "1")
+    @TableField(value = "sql_zipper_mysql")
+    private String sqlZipperMysql;
 //    @ApiModelProperty(value = "isMust", name = "是否必填", example = "是")
 //    @TableField(value = "is_must")
 //    private String isMust;

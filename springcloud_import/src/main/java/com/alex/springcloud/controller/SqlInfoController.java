@@ -26,8 +26,9 @@ public class SqlInfoController {
     @ApiOperation(value = "客户信息批量导入", httpMethod = "POST", notes = "客户信息批量导入", produces = "application/json; charset=utf-8")
     @PostMapping("/import")
     public List<SqlInfo> importItemDetail(@ApiParam(value = "type", required = true) @RequestParam(value = "type") String type,
-                                          @ApiParam(value = "file", required = true) @RequestParam(name="file") MultipartFile file,
-                                          @ApiParam(value = "startSheet", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet) throws Exception {
-        return sqlInfoService.importInfo(type, file, startSheet);
+                                          @ApiParam(value = "file", required = true) @RequestBody MultipartFile file,
+                                          @ApiParam(value = "startSheet", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
+                                          @ApiParam(value = "isFact", required = true) @RequestParam(name="isFact") String isFact) throws Exception {
+        return sqlInfoService.importInfo(type, file, startSheet, isFact);
     }
 }
