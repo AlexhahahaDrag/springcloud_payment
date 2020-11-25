@@ -5,9 +5,7 @@ import com.alex.springcloud.enums.CommonFieldEnum;
 import com.alex.springcloud.enums.ZipperFieldEnum;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @description: 字段常量
@@ -51,13 +49,25 @@ public class SystemConstant {
     //maxCompute sql
     public static final String MAX_COMPUTE = "max_compute";
 
+    //表更新类型
     public static final String ADD_CN = "增量";
 
     public static final String FULL_CN = "全量";
 
+    public static final String ADD_TABLE = "i";
+
+    public static final String FULL_TABLE = "f";
+
+    //表层级
     public static final String ODS = "ods";
 
     public static final String DWD = "dwd";
+
+    public static final String DWD_UP = "DWD";
+
+    public static final String DIM = "dim";
+
+    public static final String DIM_UP = "DIM";
 
     public static final String DWS = "dws";
 

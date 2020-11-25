@@ -61,6 +61,14 @@ public class SqlInfo {
     @TableField(value = "dwd_sql_zipper_mysql")
     private String dwdSqlZipperMysql;
 
+    @ApiModelProperty(value = "odsToDwdInitSql", name = "ods转dwd init sql", example = "1")
+    @TableField(value = "ods_to_dwd_init_sql")
+    private String odsToDwdInitSql;
+
+    @ApiModelProperty(value = "odsToDwdSql", name = "ods转dwd sql", example = "1")
+    @TableField(value = "ods_to_dwd_sql")
+    private String odsToDwdSql;
+
     @ApiModelProperty(value = "version", name = "版本号", example = "1")
     @TableField(value = "version")
     private Integer version;
