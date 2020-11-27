@@ -6,6 +6,7 @@ import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.alex.springcloud.constants.SystemConstant;
 import com.alex.springcloud.entity.SqlInfo;
 import com.alex.springcloud.entity.SqlInfoImport;
+import com.alex.springcloud.entity.SysDict;
 import com.alex.springcloud.mapper.SqlInfoMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,8 +26,11 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
     @Autowired
     private OdsToDwdSqlService odsToDwdSqlService;
 
-    public List<SqlInfo> importInfo(MultipartFile file, Integer index, Integer... isZipper) throws Exception {
-        List<SqlInfo> sqlInfos = importSql(file, index, isZipper);
+    @Autowired
+   private SysDictService sysDictService;
+
+    public List<SqlInfo> importInfo(MultipartFile file, Integer index, String dwdSysCode) throws Exception {
+        List<SqlInfo> sqlInfos = importSql(file, index, dwdSysCode);
         if (sqlInfos != null && sqlInfos.size() > 0)
             this.saveBatch(sqlInfos);
         return sqlInfos;
@@ -35,12 +39,12 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
     /**
      * @param file        导入的文件信息
      * @param index       开始识别的sheet页
-     * @param isZipper    是否是拉链表信息
+     * @param dwdSysCode  dwd系统编号
      * @description:      根据导入文件生成sql
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.SqlInfo>
      */
-    private List<SqlInfo> importSql(MultipartFile file, Integer index, Integer... isZipper) throws Exception {
+    private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode) throws Exception {
         if(file==null)
             throw new Exception("文件不能为空！");
         List<SqlInfo> list = new ArrayList<>();
@@ -76,22 +80,39 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 String dwdTableNameF;
                 String dwdTableNameCnF;
                 //根据表名的最后一位判断表是事实表还是维度表,如果是事实表生成事实表全量名
+
                 String info = odsTableName.substring(odsTableName.length() - 1);
+                String[] isZipper = null;
+                SysDict zipper = sysDictService.findSysDict(dwdSysCode, "is_zipper");
+                if (zipper != null && zipper.getValue() != null)
+                    isZipper = zipper.getValue().split(",");
+                start++;
+                Integer isZ = isZipper == null ? 1 : start < isZipper.length ? Integer.parseInt(isZipper[start]) : 1;
+                String[] s = odsTableName.split("_");
+                StringBuilder suffixName = new StringBuilder();
+                String[] dwdCode = null;
+                SysDict dwdCodes = sysDictService.findSysDict(dwdSysCode, "sys_code");
+                if (dwdCodes != null && dwdCodes.getValue() != null)
+                    dwdCode = dwdCodes.getValue().split(",");
+                suffixName.append("_" + dwdSysCode + (start < dwdCode.length ? dwdCode[start] : ""));
+                for(int i = 2; i < s.length; i++)
+                    suffixName.append("_" + s[i]);
                 if (SystemConstant.ADD_TABLE.equals(info)) {
-                    dwdTableNameI = SystemConstant.DWD + odsTableName.substring(3);
+                    dwdTableNameI = SystemConstant.DWD + suffixName.toString();
                     dwdTableNameCnI = SystemConstant.DWD_UP + odsTableNameCn.substring(3);
                     int last = dwdTableNameI.lastIndexOf("_");
                     String tail = dwdTableNameI.substring(last);
                     dwdTableNameF = dwdTableNameI.substring(0, last) + tail.replace(SystemConstant.ADD_TABLE, SystemConstant.FULL_TABLE);
                     dwdTableNameCnF = dwdTableNameCnI.substring(0, dwdTableNameCnI.length() - 2) + SystemConstant.FULL_CN;
                 } else {
-                    dwdTableNameF = SystemConstant.DIM + odsTableName.substring(3);
+                    dwdTableNameF = SystemConstant.DIM + suffixName.toString();
                     dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
                 }
+                sqlInfo.setDwdZipperTableName(dwdTableNameF);
+                sqlInfo.setDwdAddTableName(dwdTableNameI);
                 sqlInfo.setTableName(odsTableName);
                 sqlInfo.setTableNameCn(odsTableNameCn);
                 sqlInfo.setVersion(version);
-                Integer isZ = isZipper == null ? 1 : ++start < isZipper.length ? isZipper[start] : 1;
                 sqlInfo.setOdsSql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.ODS, isZ));
                 sqlInfo.setOdsSqlMysql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.ODS, isZ));
                 if (SystemConstant.ADD_TABLE.equals(info)) {

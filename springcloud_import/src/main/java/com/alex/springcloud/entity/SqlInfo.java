@@ -41,9 +41,17 @@ public class SqlInfo {
     @TableField(value = "ods_sql_mysql")
     private String odsSqlMysql;
 
+    @ApiModelProperty(value = "dwdZipperTableName", name = "ods sql", example = "1")
+    @TableField(value = "dwd_zipper_table_name")
+    private String dwdZipperTableName;
+
     @ApiModelProperty(value = "dwdSqlZipper", name = "dwd拉链表sql", example = "1")
     @TableField(value = "dwd_sql_zipper")
     private String dwdSqlZipper;
+
+    @ApiModelProperty(value = "dwdAddTableName", name = "ods sql", example = "1")
+    @TableField(value = "dwd_add_table_name")
+    private String dwdAddTableName;
 
     @ApiModelProperty(value = "dwdSqlAdd", name = "dwd增量表sql", example = "1")
     @TableField(value = "dwd_sql_add")

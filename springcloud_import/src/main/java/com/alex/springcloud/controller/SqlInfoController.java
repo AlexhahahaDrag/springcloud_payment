@@ -25,9 +25,9 @@ public class SqlInfoController {
 
     @ApiOperation(value = "客户信息批量导入", httpMethod = "POST", notes = "客户信息批量导入", produces = "application/json; charset=utf-8")
     @PostMapping("/import")
-    public List<SqlInfo> importItemDetail(@ApiParam(value = "file", required = true) @RequestBody MultipartFile file,
-                                          @ApiParam(value = "startSheet", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
-                                          @ApiParam(value = "是否是拉链表，不填时默认都是拉链表", defaultValue = "[]", example = "[1,0](1:是, 0:否)") @RequestParam(value = "isZipper", required = false) Integer... isZipper) throws Exception {
-        return sqlInfoService.importInfo(file, startSheet, isZipper);
+    public List<SqlInfo> importItemDetail(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
+                                          @ApiParam(value = "dwd系统编号", defaultValue = "", example = "302") @RequestParam(name="dwdSysCode", required = false, defaultValue = "") String dwdSysCode,
+                                          @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet) throws Exception {
+        return sqlInfoService.importInfo(file, startSheet, dwdSysCode);
     }
 }
