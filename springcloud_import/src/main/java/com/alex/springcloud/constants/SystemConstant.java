@@ -33,6 +33,14 @@ public class SystemConstant {
         DWD_ZIPPER_TABLE.put(ZipperFieldEnum.S_END_TIME.getCode(), ZipperFieldEnum.S_END_TIME.getComment());
     }
 
+    //分区时间变量
+    public static final String CURTIME = "${curTime}";
+
+    public static final String CREATETIME = "create_time";
+
+    public static final String UPDATETIME = "update_time";
+
+    public static final String ISVALID = "is_valid";
     //sql常量
     //增量
     public static final String ADD_TYPE = "add";
