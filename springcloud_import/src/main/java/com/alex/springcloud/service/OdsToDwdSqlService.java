@@ -29,7 +29,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type) {
+    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper) {
         StringBuilder columns = new StringBuilder();
         for (SqlInfoImport sqlInfoImport : list)
             columns.append(",record." + sqlInfoImport.getColumn());
@@ -38,7 +38,7 @@ public class OdsToDwdSqlService {
             noHeadColumns.append("," + sqlInfoImport.getColumn());
         String sysCode = odsTableName.split("_")[1];
         if (SystemConstant.ADD_TABLE.equals(type))
-            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode);
+            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper);
         else if (SystemConstant.FULL_TABLE.equals(type))
             return setOdsToDwdInitSqlFull(noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode);
         return "";
@@ -95,7 +95,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode) {
+    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper) {
         boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
@@ -116,26 +116,32 @@ public class OdsToDwdSqlService {
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds='" + SystemConstant.CURTIME + "')");
         sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
         sb.append(noHeadColumns);
-        if (flag) {
-            sb.append(" ,CASE ");
-        }
-        if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-            sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-        }
-        if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-            sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
-        }
-        if (flag) {
-            sb.append(" ELSE '19710101000000'");
+        if (isZipper == 0) {
+            sb.append(" ,null as " + ZipperFieldEnum.S_START_TIME.getCode());
+            sb.append(" ,null as " + ZipperFieldEnum.S_END_TIME.getCode());
+            sb.append(" ,null as " + ZipperFieldEnum.S_STAT.getCode());
         } else {
-            sb.append(" ,'19710101000000'");
+            if (flag) {
+                sb.append(" ,CASE ");
+            }
+            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
+                sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
+            }
+            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
+                sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
+            }
+            if (flag) {
+                sb.append(" ELSE '19710101000000'");
+            } else {
+                sb.append(" ,'19710101000000'");
+            }
+            if (flag) {
+                sb.append(" END ");
+            }
+            sb.append(" as " + ZipperFieldEnum.S_START_TIME.getCode());
+            sb.append(" ,'20990101000000' as " + ZipperFieldEnum.S_END_TIME.getCode());
+            sb.append(",'1' as " + ZipperFieldEnum.S_STAT.getCode());
         }
-        if (flag) {
-            sb.append(" END ");
-        }
-        sb.append(" as " + ZipperFieldEnum.S_START_TIME.getCode());
-        sb.append(" ,'20990101000000' as " + ZipperFieldEnum.S_END_TIME.getCode());
-        sb.append(",'1' as " + ZipperFieldEnum.S_STAT.getCode());
         sb.append("," + CommonFieldEnum.S_SRC.getCode());
         sb.append(" FROM " + dwdTableNameI);
         sb.append(" WHERE ds='" + SystemConstant.CURTIME + "';");
@@ -151,6 +157,7 @@ public class OdsToDwdSqlService {
      * @param dwdTableNameI   dwd增量表名
      * @param dwdTableNameF   dwd全量表名
      * @param type            传入类型（全量、增量）
+     * @param isZipper        是否是拉链
      * @description:          生成ods到dwd的同步sql
      * @author: alex
      * @return: java.lang.String
@@ -181,10 +188,9 @@ public class OdsToDwdSqlService {
      * @return: java.lang.String
      */
     public String setOdsToDwdSqlFull(String columns, String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode) {
-        boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
         StringBuilder sb = new StringBuilder();
         sb.append(" WITH at_" + odsTableName + " AS ( ");
-        sb.append(" SELECT CONCAT(' " + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode() + ",");
+        sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode() + ",");
         sb.append(noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", "").substring(1));
         sb.append(",cnt, max_s_sdt, max_ds, row_number() over (partition by id order by max_ds desc) as rm FROM ");
         sb.append(" ( ");
@@ -241,15 +247,15 @@ public class OdsToDwdSqlService {
         if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
             sb.append("  WHEN action = 'insert' AND " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
         }
-        sb.append("  WHEN tb_update.action = 'insert' THEN '19710101000000' ");
-        sb.append("  ELSE tb_update.max_s_sdt ");
+        sb.append("  WHEN action = 'insert' THEN '19710101000000' ");
+        sb.append("  ELSE max_s_sdt ");
         sb.append(" END as " + ZipperFieldEnum.S_START_TIME.getCode());
         sb.append("         ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
         sb.append("        ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
         sb.append(" ,CONCAT('" + sysCode + "_',s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
         sb.append(" FROM    tb_update_" + odsTableName);
-        sb.append(" WHERE   " + AddFieldEnum.S_ACTION.getCode() + " = 'update' ");
-        sb.append(" OR      " + AddFieldEnum.S_ACTION.getCode() + " = 'insert'; ");
+        sb.append(" WHERE action = 'update' ");
+        sb.append(" OR action = 'insert'; ");
         return sb.toString();
     }
 
@@ -293,27 +299,29 @@ public class OdsToDwdSqlService {
             sb.append("  UNION ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
-            if (flag) {
-                sb.append(" ,CASE ");
-            }
-            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-                sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-            }
-            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-                sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
-            }
-            if (flag) {
-                sb.append(" ELSE '19710101000000'");
-            } else {
-                sb.append(" ,'19710101000000'");
-            }
-            if (flag) {
-                sb.append(" END ");
-            }
-            sb.append(" as " + ZipperFieldEnum.S_START_TIME.getCode());
-            sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
-            sb.append(" ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
-            sb.append(" ,CONCAT('1020005_',s_org_code) AS s_src ");
+            sb.append(" ,null " + ZipperFieldEnum.S_START_TIME.getCode());
+            sb.append(" ,null AS " + ZipperFieldEnum.S_END_TIME.getCode());
+//            if (flag) {
+//                sb.append(" ,CASE ");
+//            }
+//            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
+//                sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
+//            }
+//            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
+//                sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
+//            }
+//            if (flag) {
+//                sb.append(" ELSE '19710101000000'");
+//            } else {
+//                sb.append(" ,'19710101000000'");
+//            }
+//            if (flag) {
+//                sb.append(" END ");
+//            }
+//            sb.append(" as " + ZipperFieldEnum.S_START_TIME.getCode());
+//            sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
+            sb.append(" ,null AS " + ZipperFieldEnum.S_STAT.getCode());
+            sb.append(" ,CONCAT('1020005_',s_org_code) AS  " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM    tmp_at_" + odsTableName + ";");
             sb.append(" DROP TABLE tmp_at_" + odsTableName + " ; ");
         } else if (noHeadColumns.contains(SystemConstant.CREATETIME) && noHeadColumns.contains(SystemConstant.UPDATETIME) && noHeadColumns.contains(SystemConstant.ISVALID)) {
@@ -335,7 +343,7 @@ public class OdsToDwdSqlService {
             sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
             sb.append(" SELECT   record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
-            sb.append("         ,record.s_start_time " + ZipperFieldEnum.S_START_TIME.getCode());
+            sb.append("         ,record." + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append("         ,CASE    WHEN b.id IS NOT NULL AND rm = 1 THEN b.update_time ");
             sb.append("         ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
@@ -352,7 +360,7 @@ public class OdsToDwdSqlService {
             sb.append(" JOIN    tb_update_" + odsTableName + " b ");
             sb.append(" ON      record.id = b.id ");
             sb.append(" UNION ");
-            sb.append(" SELECT  s_key " + CommonFieldEnum.S_KEY.getCode());
+            sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             sb.append(" ,CASE WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
             sb.append("  WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME + " ELSE '19710101000000' END AS " + ZipperFieldEnum.S_START_TIME.getCode());
@@ -368,7 +376,7 @@ public class OdsToDwdSqlService {
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
             sb.append(" SELECT *,row_number() over (partition by id order by max_ds desc) as rm FROM ");
             sb.append("         ( ");
-            sb.append("                 SELECT " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns);
+            sb.append("                 SELECT " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
             sb.append("                 ,count(1) as cnt,MAX(s_sdt) as max_s_sdt,MAX(ds) as max_ds ");
             sb.append("                FROM ");
             sb.append("                         ( ");
@@ -380,7 +388,7 @@ public class OdsToDwdSqlService {
             sb.append("                                 ,ds ");
             sb.append("                                FROM " + odsTableName + " WHERE ds='" + SystemConstant.CURTIME + "' ");
             sb.append("                         ) a ");
-            sb.append("                 GROUP BY " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns);
+            sb.append("                 GROUP BY " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
             sb.append("         ) b ");
             sb.append(" WHERE cnt=1; ");
             sb.append(" CREATE TABLE tb_update_" + odsTableName + " AS SELECT * FROM ");
@@ -451,7 +459,6 @@ public class OdsToDwdSqlService {
             sb.append(" DROP TABLE tmp_at_" + odsTableName + "; ");
             sb.append(" DROP TABLE tb_update_" + odsTableName + "; ");
         }
-
         return sb.toString();
     }
 }
