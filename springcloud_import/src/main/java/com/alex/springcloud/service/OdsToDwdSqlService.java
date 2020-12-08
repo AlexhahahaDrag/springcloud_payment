@@ -63,10 +63,10 @@ public class OdsToDwdSqlService {
             sb.append(" ,CASE ");
         }
         if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-            sb.append(" WHEN update_time IS NOT NULL THEN TO_CHAR(TO_DATE(update_time,'yyyy-mm-dd hh:mi:ss'),'yyyymmddhhmiss') ");
+            sb.append(" WHEN update_time IS NOT NULL THEN " + SystemConstant.UPDATETIME);
         }
         if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-            sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN TO_CHAR(TO_DATE(" + SystemConstant.CREATETIME + ",'yyyy-mm-dd hh:mi:ss'),'yyyymmddhhmiss') ");
+            sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
         }
         if (flag) {
             sb.append(" ELSE '19710101000000'");

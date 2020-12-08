@@ -34,7 +34,8 @@ public class SystemConstant {
     }
 
     //分区时间变量
-    public static final String CURTIME = "${curTime}";
+    //public static final String CURTIME = "${curTime}";
+    public static final String CURTIME = "${bdp.system.bizdate}";
 
     public static final String CREATETIME = "create_time";
 

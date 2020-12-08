@@ -52,7 +52,7 @@ public class TableSqlService {
                 stringBuilder.append(" COMMENT '" + entry.getValue() + "',");
             }
         }
-        if (SystemConstant.ZIPPER_TYPE.equals(type) && isZ == 1) {
+        if (SystemConstant.ZIPPER_TYPE.equals(type)) {
             for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet()) {
                 stringBuilder.append("`" + entry.getKey() + "` ");
                 stringBuilder.append("string");
