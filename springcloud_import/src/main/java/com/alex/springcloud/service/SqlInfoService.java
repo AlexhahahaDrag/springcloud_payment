@@ -94,7 +94,7 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 SysDict dwdCodes = sysDictService.findSysDict(dwdSysCode, "sys_code");
                 if (dwdCodes != null && dwdCodes.getValue() != null)
                     dwdCode = dwdCodes.getValue().split(",");
-                suffixName.append("_" + dwdSysCode + (start < dwdCode.length ? dwdCode[start] : ""));
+                suffixName.append("_" + dwdSysCode + (dwdCode == null ? "" : (start < dwdCode.length ? dwdCode[start] : "")));
                 for(int i = 2; i < s.length; i++)
                     suffixName.append("_" + s[i]);
                 if (SystemConstant.ADD_TABLE.equals(info)) {

@@ -38,12 +38,12 @@ public class TableSqlService {
         if (SystemConstant.DWD.equals(level)) {
             stringBuilder.append("`" + CommonFieldEnum.S_KEY.getCode() + "` ");
             stringBuilder.append("string");
-            stringBuilder.append(" COMMENT '" + CommonFieldEnum.S_KEY.getComment() + "',");
+            stringBuilder.append(" COMMENT '" + (CommonFieldEnum.S_KEY.getComment() == null ? "" : CommonFieldEnum.S_KEY.getComment()) + "',");
         }
         for (SqlInfoImport sqlInfoImport : list) {
             stringBuilder.append("`" + sqlInfoImport.getColumn() + "` ");
             stringBuilder.append(sqlInfoImport.getColumnType() == null ? "string" : sqlInfoImport.getColumnType());
-            stringBuilder.append(" COMMENT '" + sqlInfoImport.getColumnName() + "',");
+            stringBuilder.append(" COMMENT '" + (sqlInfoImport.getColumnName() == null ? "" : sqlInfoImport.getColumnName()) + "',");
         }
         if (SystemConstant.ADD_TYPE.equals(type)) {
             for(Map.Entry entry : SystemConstant.DWD_ADD_TABLE.entrySet()) {
@@ -72,7 +72,7 @@ public class TableSqlService {
             stringBuilder.append(" PARTITIONED BY (ds string COMMENT '业务日期');");
         }
         if (SystemConstant.MYSQL_TYPE.equals(database)) {
-            stringBuilder.append(") COMMENT = '" + tableNameCn + "';");
+            stringBuilder.append(") COMMENT = '" + (tableNameCn == null ? "" : tableNameCn) + "';");
         }
         return stringBuilder.toString();
     }

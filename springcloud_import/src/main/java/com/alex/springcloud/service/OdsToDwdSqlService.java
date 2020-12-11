@@ -358,7 +358,7 @@ public class OdsToDwdSqlService {
             sb.append("         WHERE   ds = '" + SystemConstant.CURTIME + "' - 1");
             sb.append(" ) record LEFT ");
             sb.append(" JOIN    tb_update_" + odsTableName + " b ");
-            sb.append(" ON      record.id = b.id ");
+            sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() +" = b." + CommonFieldEnum.S_KEY.getCode());
             sb.append(" UNION ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
