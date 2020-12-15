@@ -27,7 +27,9 @@ public class SqlInfoController {
     @PostMapping("/import")
     public List<SqlInfo> importItemDetail(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
                                           @ApiParam(value = "dwd系统编号", defaultValue = "", example = "302") @RequestParam(name="dwdSysCode", required = false, defaultValue = "") String dwdSysCode,
-                                          @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet) throws Exception {
-        return sqlInfoService.importInfo(file, startSheet, dwdSysCode);
+                                          @ApiParam(value = "ods标准表前缀", defaultValue = "", example = "PRJ_302_DW_dev") @RequestParam(name="odsPrefix", required = false, defaultValue = "") String odsPrefix,
+                                          @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
+                                          @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
+        return sqlInfoService.importInfo(file, startSheet, dwdSysCode, odsPrefix, belongTo);
     }
 }

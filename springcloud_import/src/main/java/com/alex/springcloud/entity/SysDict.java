@@ -1,8 +1,6 @@
 package com.alex.springcloud.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,4 +26,8 @@ public class SysDict {
     @ApiModelProperty(value = "value", name = "值", example = "01,02")
     @TableField(value = "value")
     private String value;
+
+    @ApiModelProperty(value = "belongTo", name = "属于", example = "kobe")
+    @TableField(value = "belong_to")
+    private String belongTo;
 }

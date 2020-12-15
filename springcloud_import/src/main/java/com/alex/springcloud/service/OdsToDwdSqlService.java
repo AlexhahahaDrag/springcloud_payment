@@ -5,6 +5,7 @@ import com.alex.springcloud.entity.SqlInfoImport;
 import com.alex.springcloud.enums.AddFieldEnum;
 import com.alex.springcloud.enums.CommonFieldEnum;
 import com.alex.springcloud.enums.ZipperFieldEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper) {
+    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper, String odsPrefix) {
         StringBuilder columns = new StringBuilder();
         for (SqlInfoImport sqlInfoImport : list)
             columns.append(",record." + sqlInfoImport.getColumn());
@@ -38,9 +39,9 @@ public class OdsToDwdSqlService {
             noHeadColumns.append("," + sqlInfoImport.getColumn());
         String sysCode = odsTableName.split("_")[1];
         if (SystemConstant.ADD_TABLE.equals(type))
-            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper);
+            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix);
         else if (SystemConstant.FULL_TABLE.equals(type))
-            return setOdsToDwdInitSqlFull(noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode);
+            return setOdsToDwdInitSqlFull(noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix);
         return "";
     }
 
@@ -53,7 +54,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSqlFull(String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode) {
+    public String setOdsToDwdInitSqlFull(String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix) {
         boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
@@ -80,7 +81,11 @@ public class OdsToDwdSqlService {
         sb.append(" ,'20990101000000' as " + ZipperFieldEnum.S_END_TIME.getCode());
         sb.append(" ,'1' as " + ZipperFieldEnum.S_STAT.getCode());
         sb.append(" ,CONCAT(' " + sysCode + "_',s_org_code) as " + CommonFieldEnum.S_SRC.getCode());
-        sb.append("  FROM " + odsTableName);
+        sb.append(" FROM ");
+        if (StringUtils.isNotBlank(odsPrefix)) {
+            sb.append(odsPrefix + ".");
+        }
+        sb.append(odsTableName);
         sb.append(" WHERE ds='" + SystemConstant.CURTIME + "';");
         return sb.toString();
     }
@@ -95,7 +100,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper) {
+    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper, String odsPrefix) {
         boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
@@ -111,7 +116,11 @@ public class OdsToDwdSqlService {
         sb.append(noHeadColumns);
         sb.append(" ,'insert' as " + AddFieldEnum.S_ACTION.getCode());
         sb.append(" ,CONCAT('" + sysCode + "_', s_org_code) as " + CommonFieldEnum.S_SRC.getCode());
-        sb.append(" FROM " + odsTableName);
+        sb.append(" FROM ");
+        if (StringUtils.isNotBlank(odsPrefix)) {
+            sb.append(odsPrefix + ".");
+        }
+        sb.append(odsTableName);
         sb.append(" WHERE ds='" + SystemConstant.CURTIME + "') record;");
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds='" + SystemConstant.CURTIME + "')");
         sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
@@ -158,11 +167,12 @@ public class OdsToDwdSqlService {
      * @param dwdTableNameF   dwd全量表名
      * @param type            传入类型（全量、增量）
      * @param isZipper        是否是拉链
+     * @param odsPrefix       ods标准所在空间
      * @description:          生成ods到dwd的同步sql
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper) {
+    public String setOdsToDwdSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper, String odsPrefix) {
         StringBuilder columns = new StringBuilder();
         for (SqlInfoImport sqlInfoImport : list)
             columns.append(",record." + sqlInfoImport.getColumn());
@@ -171,9 +181,9 @@ public class OdsToDwdSqlService {
             noHeadColumns.append("," + sqlInfoImport.getColumn());
         String sysCode = odsTableName.split("_")[1];
         if (SystemConstant.ADD_TABLE.equals(type))
-            return setOdsToDwdSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper);
+            return setOdsToDwdSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix);
         else if (SystemConstant.FULL_TABLE.equals(type))
-            return setOdsToDwdSqlFull(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode);
+            return setOdsToDwdSqlFull(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix);
         return "";
     }
 
@@ -183,11 +193,12 @@ public class OdsToDwdSqlService {
      * @param odsTableName    dwd增量事实表名
      * @param dwdTableNameF   dwd全量事实表名
      * @param sysCode         系统编号（ods表名ods_后到下一个_的数据）
+     * @param odsPrefix       ods标准所在空间
      * @description:          生成ods到dwd维度表同步的sql
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSqlFull(String columns, String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode) {
+    public String setOdsToDwdSqlFull(String columns, String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix) {
         StringBuilder sb = new StringBuilder();
         sb.append(" WITH at_" + odsTableName + " AS ( ");
         sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode() + ",");
@@ -199,9 +210,19 @@ public class OdsToDwdSqlService {
         sb.append("        ,count(1) as cnt,MAX(s_sdt) as max_s_sdt,MAX(ds) as max_ds ");
         sb.append("        FROM ");
         sb.append("                ( ");
-        sb.append("                        SELECT * FROM " + odsTableName + " WHERE ds='" + SystemConstant.CURTIME + "' - 1 ");
+        sb.append("                        SELECT * FROM ");
+        if (StringUtils.isNotBlank(odsPrefix)) {
+            sb.append(odsPrefix + ".");
+        }
+        sb.append(odsTableName);
+        sb.append(" WHERE ds='" + SystemConstant.CURTIME + "' - 1 ");
         sb.append("                        UNION ALL ");
-        sb.append("                        SELECT * FROM " + odsTableName + " WHERE ds='" + SystemConstant.CURTIME + "' ");
+        sb.append("                        SELECT * FROM ");
+        if (StringUtils.isNotBlank(odsPrefix)) {
+            sb.append(odsPrefix + ".");
+        }
+        sb.append(odsTableName);
+        sb.append(" WHERE ds='" + SystemConstant.CURTIME + "' ");
         sb.append("                 ) a ");
         sb.append("         GROUP BY " + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", "").substring(1));
         sb.append(" ) b ");
@@ -266,11 +287,13 @@ public class OdsToDwdSqlService {
      * @param dwdTableNameI    dwd增量事实表名
      * @param dwdTableNameF    dwd全量事实表名
      * @param sysCode          系统编号（ods表名ods_后到下一个_的数据）
+     * @param isZipper         是否是拉链
+     * @param odsPrefix        ods标准所在空间
      * @description:           生成ods到dwd事实表同步的sql
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper) {
+    public String setOdsToDwdSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper, String odsPrefix) {
         boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
         StringBuilder sb = new StringBuilder();
         if (isZipper == 0) {
@@ -278,7 +301,11 @@ public class OdsToDwdSqlService {
             sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_',id) AS " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             sb.append(" ,'insert' AS " + AddFieldEnum.S_ACTION.getCode());
-            sb.append(" FROM " + odsTableName);
+            sb.append(" FROM ");
+            if (StringUtils.isNotBlank(odsPrefix)) {
+                sb.append(odsPrefix + ".");
+            }
+            sb.append(odsTableName);
             sb.append(" WHERE ds = '" + SystemConstant.CURTIME + "';");
             sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
@@ -332,7 +359,12 @@ public class OdsToDwdSqlService {
             sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL AND " + SystemConstant.UPDATETIME + " >= '" + SystemConstant.CURTIME + "' THEN 'update' ");
             sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
             sb.append("         ,CONCAT('" + sysCode + "_', record.s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
-            sb.append(" FROM    " + odsTableName + " AS record ");
+            sb.append(" FROM    ");
+            if (StringUtils.isNotBlank(odsPrefix)) {
+                sb.append(odsPrefix + ".");
+            }
+            sb.append(odsTableName);
+            sb.append(" AS record ");
             sb.append(" WHERE   ds = '" + SystemConstant.CURTIME + "';");
             sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.CURTIME +"') ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
@@ -386,7 +418,10 @@ public class OdsToDwdSqlService {
             sb.append("                                 UNION ALL ");
             sb.append("                                SELECT CONCAT('" + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns);
             sb.append("                                 ,ds ");
-            sb.append("                                FROM " + odsTableName + " WHERE ds='" + SystemConstant.CURTIME + "' ");
+            sb.append(" FROM ");
+            if (StringUtils.isNotBlank(odsPrefix))
+                sb.append(odsPrefix + ".");
+            sb.append(odsTableName + " WHERE ds='" + SystemConstant.CURTIME + "' ");
             sb.append("                         ) a ");
             sb.append("                 GROUP BY " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
             sb.append("         ) b ");

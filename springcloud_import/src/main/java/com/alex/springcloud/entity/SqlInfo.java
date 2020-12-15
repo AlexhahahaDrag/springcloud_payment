@@ -21,9 +21,9 @@ public class SqlInfo {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "type", name = "类型", example = "ods")
-    @TableField(value = "type")
-    private String type;
+//    @ApiModelProperty(value = "type", name = "类型", example = "ods")
+//    @TableField(value = "type")
+//    private String type;
 
     @ApiModelProperty(value = "tableName", name = "表名", example = "ods_table_name")
     @TableField(value = "table_name")
@@ -57,9 +57,9 @@ public class SqlInfo {
     @TableField(value = "dwd_sql_add")
     private String dwdSqlAdd;
 
-    @ApiModelProperty(value = "isFact", name = "是否是事实表1:是 0:否", example = "1")
-    @TableField(value = "is_fact")
-    private String isFact;
+//    @ApiModelProperty(value = "isFact", name = "是否是事实表1:是 0:否", example = "1")
+//    @TableField(value = "is_fact")
+//    private String isFact;
 
     @ApiModelProperty(value = "dwdSqlAddMysql", name = "dwd mysql add sql", example = "1")
     @TableField(value = "dwd_sql_add_mysql")
@@ -77,7 +77,15 @@ public class SqlInfo {
     @TableField(value = "ods_to_dwd_sql")
     private String odsToDwdSql;
 
-    @ApiModelProperty(value = "version", name = "版本号", example = "1")
-    @TableField(value = "version")
-    private Integer version;
+//    @ApiModelProperty(value = "version", name = "版本号", example = "1")
+//    @TableField(value = "version")
+//    private Integer version;
+
+    @ApiModelProperty(value = "sysCode", name = "系统编号", example = "302")
+    @TableField(value = "sys_code")
+    private String sysCode;
+
+    @ApiModelProperty(value = "belongTo", name = "属于", example = "kobe")
+    @TableField(value = "belong_to")
+    private String belongTo;
 }

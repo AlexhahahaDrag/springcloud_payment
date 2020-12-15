@@ -18,10 +18,11 @@ public class SysDictService {
     @Autowired
     private SysDictMapper sysDictMapper;
 
-    public SysDict findSysDict(String sysCode, String code) {
+    public SysDict findSysDict(String sysCode, String code, String belongTo) {
         QueryWrapper<SysDict> wrapper = new QueryWrapper<>();
         wrapper.eq("sys_code", sysCode);
         wrapper.eq("code", code);
+        wrapper.eq("belong_to", belongTo);
         return sysDictMapper.selectOne(wrapper);
     }
 }
