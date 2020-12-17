@@ -446,7 +446,7 @@ public class OdsToDwdSqlService {
             sb.append(" FROM ");
             sb.append("         ( ");
             sb.append("                 SELECT " + CommonFieldEnum.S_KEY.getCode());
-            sb.append(noHeadColumns);
+            sb.append(noHeadColumns.replace(",s_sdt", ",max_s_sdt as s_sdt").replace(",S_SDT", ",max_s_sdt as s_sdt"));
             sb.append("                 ,   CONCAT('" + sysCode + "_',s_org_code) as " + CommonFieldEnum.S_SRC.getCode());
             sb.append("                 ,   action as " + AddFieldEnum.S_ACTION.getCode());
             sb.append("                FROM tb_update_" + odsTableName + ") ");
