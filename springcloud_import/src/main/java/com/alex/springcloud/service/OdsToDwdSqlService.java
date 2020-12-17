@@ -433,7 +433,7 @@ public class OdsToDwdSqlService {
             sb.append("                ,CASE WHEN atc.cnt=2 AND rm=2 THEN 'his' ");
             sb.append(" WHEN atc.cnt=2 AND rm=1 THEN 'update' ");
             sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.CURTIME + "' THEN 'insert' ");
-            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.CURTIME + " - 1' THEN 'delete' ");
+            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.CURTIME + "' - 1 THEN 'delete' ");
             sb.append(" END AS action ");
             sb.append(" FROM tmp_at_" + odsTableName + " tmp_at LEFT JOIN ( SELECT " + CommonFieldEnum.S_KEY.getCode() + ",COUNT(1) as cnt FROM tmp_at_" + odsTableName + " GROUP BY " + CommonFieldEnum.S_KEY.getCode() + " ) atc ON tmp_at." + CommonFieldEnum.S_KEY.getCode() + "=atc." + CommonFieldEnum.S_KEY.getCode() + " ) tb_u ");
             sb.append(" WHERE action <> 'his'; ");
