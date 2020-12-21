@@ -37,11 +37,6 @@ public class SystemConstant {
     //public static final String CURTIME = "${curTime}";
     public static final String CURTIME = "${bdp.system.bizdate}";
 
-    public static final String CREATETIME = "create_time";
-
-    public static final String UPDATETIME = "update_time";
-
-    public static final String ISVALID = "is_valid";
     //sql常量
     //增量
     public static final String ADD_TYPE = "add";

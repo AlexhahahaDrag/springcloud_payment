@@ -30,7 +30,8 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper, String odsPrefix) {
+    public String setOdsToDwdInitSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF,
+                                     String type, Integer isZipper, String odsPrefix, String[] createTimes, String[] updateTimes) {
         StringBuilder columns = new StringBuilder();
         for (SqlInfoImport sqlInfoImport : list)
             columns.append(",record." + sqlInfoImport.getColumn());
@@ -39,9 +40,9 @@ public class OdsToDwdSqlService {
             noHeadColumns.append("," + sqlInfoImport.getColumn());
         String sysCode = odsTableName.split("_")[1];
         if (SystemConstant.ADD_TABLE.equals(type))
-            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix);
+            return setOdsToDwdInitSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix, createTimes, updateTimes);
         else if (SystemConstant.FULL_TABLE.equals(type))
-            return setOdsToDwdInitSqlFull(noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix);
+            return setOdsToDwdInitSqlFull(noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix, createTimes, updateTimes);
         return "";
     }
 
@@ -54,8 +55,8 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSqlFull(String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix) {
-        boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
+    public String setOdsToDwdInitSqlFull(String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix, String[] createTimes, String[] updateTimes) {
+        boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
         sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode());
@@ -63,12 +64,16 @@ public class OdsToDwdSqlService {
         if (flag) {
             sb.append(" ,CASE ");
         }
-        if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-            sb.append(" WHEN update_time IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-        }
-        if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-            sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
-        }
+        if (updateTimes != null && updateTimes.length > 0)
+            for (String updateTime : updateTimes) {
+                String newUpdateTime = dealTime(updateTime);
+                sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+            }
+        if (createTimes != null && createTimes.length > 0)
+            for (String createTime : createTimes) {
+                String newCreateTime = dealTime(createTime);
+                sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+            }
         if (flag) {
             sb.append(" ELSE '19710101000000'");
         } else {
@@ -100,8 +105,8 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper, String odsPrefix) {
-        boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
+    public String setOdsToDwdInitSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper, String odsPrefix, String[] createTimes, String[] updateTimes) {
+        boolean flag = (updateTimes != null && updateTimes.length > 0) || (createTimes != null && createTimes.length > 0);
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.CURTIME + "') ");
         sb.append(" SELECT ");
@@ -133,12 +138,16 @@ public class OdsToDwdSqlService {
             if (flag) {
                 sb.append(" ,CASE ");
             }
-            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-                sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-            }
-            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-                sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
-            }
+            if (updateTimes != null && updateTimes.length > 0)
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                }
+            if (createTimes != null && createTimes.length > 0)
+                for (String createTime : createTimes) {
+                    String newCreateTime = dealTime(createTime);
+                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+                }
             if (flag) {
                 sb.append(" ELSE '19710101000000'");
             } else {
@@ -154,9 +163,19 @@ public class OdsToDwdSqlService {
         sb.append("," + CommonFieldEnum.S_SRC.getCode());
         sb.append(" FROM " + dwdTableNameI);
         sb.append(" WHERE ds='" + SystemConstant.CURTIME + "';");
+        return sb.toString();
+    }
 
-
-
+    private String dealTime(String time) {
+        if (StringUtils.isEmpty(time) || !time.contains("+"))
+            return time;
+        String[] split = time.split("\\+");
+        StringBuilder sb = new StringBuilder();
+        sb.append("concat(");
+        for(String sp : split)
+            sb.append(sp + ",");
+        sb.replace(sb.length() - 1, sb.length(), "");
+        sb.append(")");
         return sb.toString();
     }
 
@@ -172,7 +191,8 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type, Integer isZipper, String odsPrefix) {
+    public String setOdsToDwdSql(List<SqlInfoImport> list, String odsTableName, String dwdTableNameI, String dwdTableNameF, String type,
+                                 Integer isZipper, String odsPrefix, String[] createTimes, String[] updateTimes) {
         StringBuilder columns = new StringBuilder();
         for (SqlInfoImport sqlInfoImport : list)
             columns.append(",record." + sqlInfoImport.getColumn());
@@ -181,9 +201,9 @@ public class OdsToDwdSqlService {
             noHeadColumns.append("," + sqlInfoImport.getColumn());
         String sysCode = odsTableName.split("_")[1];
         if (SystemConstant.ADD_TABLE.equals(type))
-            return setOdsToDwdSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix);
+            return setOdsToDwdSqlAdd(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameI, dwdTableNameF, sysCode, isZipper, odsPrefix, createTimes, updateTimes);
         else if (SystemConstant.FULL_TABLE.equals(type))
-            return setOdsToDwdSqlFull(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix);
+            return setOdsToDwdSqlFull(columns.toString(), noHeadColumns.toString(), odsTableName, dwdTableNameF, sysCode, odsPrefix, createTimes, updateTimes);
         return "";
     }
 
@@ -198,7 +218,7 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSqlFull(String columns, String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix) {
+    public String setOdsToDwdSqlFull(String columns, String noHeadColumns, String odsTableName, String dwdTableNameF, String sysCode, String odsPrefix, String[] createTimes, String[] updateTimes) {
         StringBuilder sb = new StringBuilder();
         sb.append(" WITH at_" + odsTableName + " AS ( ");
         sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_',id) as " + CommonFieldEnum.S_KEY.getCode() + ",");
@@ -262,11 +282,17 @@ public class OdsToDwdSqlService {
         sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
         sb.append(noHeadColumns.replace(",s_sdt", ",max_s_sdt as s_sdt").replace(",S_SDT", ",max_s_sdt as s_sdt"));
         sb.append(",CASE ");
-        if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-            sb.append(" WHEN action = 'insert' and " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
+        if (updateTimes != null && updateTimes.length > 0) {
+            for (String updateTime : updateTimes) {
+                String newUpdateTime = dealTime(updateTime);
+                sb.append(" WHEN action = 'insert' and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+            }
         }
-        if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-            sb.append("  WHEN action = 'insert' AND " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
+        if (createTimes != null && createTimes.length > 0) {
+            for (String createTime : createTimes) {
+                String newCreateTime = dealTime(createTime);
+                sb.append("  WHEN action = 'insert' AND " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+            }
         }
         sb.append("  WHEN action = 'insert' THEN '19710101000000' ");
         sb.append("  ELSE max_s_sdt ");
@@ -293,8 +319,8 @@ public class OdsToDwdSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setOdsToDwdSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode, Integer isZipper, String odsPrefix) {
-        boolean flag = noHeadColumns.contains(SystemConstant.CREATETIME) || noHeadColumns.contains(SystemConstant.UPDATETIME);
+    public String setOdsToDwdSqlAdd(String columns, String noHeadColumns, String odsTableName, String dwdTableNameI, String dwdTableNameF, String sysCode,
+                                    Integer isZipper, String odsPrefix, String[] createTimes, String[] updateTimes) {
         StringBuilder sb = new StringBuilder();
         if (isZipper == 0) {
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
@@ -328,36 +354,33 @@ public class OdsToDwdSqlService {
             sb.append(noHeadColumns);
             sb.append(" ,null " + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append(" ,null AS " + ZipperFieldEnum.S_END_TIME.getCode());
-//            if (flag) {
-//                sb.append(" ,CASE ");
-//            }
-//            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-//                sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-//            }
-//            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-//                sb.append(" WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME);
-//            }
-//            if (flag) {
-//                sb.append(" ELSE '19710101000000'");
-//            } else {
-//                sb.append(" ,'19710101000000'");
-//            }
-//            if (flag) {
-//                sb.append(" END ");
-//            }
-//            sb.append(" as " + ZipperFieldEnum.S_START_TIME.getCode());
-//            sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" ,null AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" ,CONCAT('1020005_',s_org_code) AS  " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM    tmp_at_" + odsTableName + ";");
             sb.append(" DROP TABLE tmp_at_" + odsTableName + " ; ");
-        } else if (noHeadColumns.contains(SystemConstant.CREATETIME) && noHeadColumns.contains(SystemConstant.UPDATETIME) && noHeadColumns.contains(SystemConstant.ISVALID)) {
+        } else if (isZipper == 1) {
+            boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
             sb.append(" CREATE TABLE tb_update_" + odsTableName + " AS ");
             sb.append(" SELECT  CONCAT('" + sysCode + "_', record.s_org_code, '_', record.id) AS " + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
-            sb.append("         ,CASE    WHEN " + SystemConstant.CREATETIME + " IS NOT NULL AND " + SystemConstant.CREATETIME + " >= '" + SystemConstant.CURTIME + "' THEN 'insert' ");
-            sb.append(" WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL AND " + SystemConstant.UPDATETIME + " >= '" + SystemConstant.CURTIME + "' THEN 'update' ");
-            sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
+            if (flag)
+                sb.append(" ,CASE ");
+            if (createTimes != null && createTimes.length > 0) {
+                for (String createTime : createTimes) {
+                    String newCreateTime = dealTime(createTime);
+                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL AND " + newCreateTime + " >= '" + SystemConstant.CURTIME + "' THEN 'insert' ");
+                }
+            }
+            if (updateTimes != null && updateTimes.length > 0) {
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL AND " + newUpdateTime + " >= '" + SystemConstant.CURTIME + "' THEN 'update' ");
+                }
+            }
+            if (flag)
+                sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
+            else
+                sb.append("''" + AddFieldEnum.S_ACTION.getCode());
             sb.append("         ,CONCAT('" + sysCode + "_', record.s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM    ");
             if (StringUtils.isNotBlank(odsPrefix)) {
@@ -394,8 +417,24 @@ public class OdsToDwdSqlService {
             sb.append(" UNION ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
-            sb.append(" ,CASE WHEN " + SystemConstant.UPDATETIME + " IS NOT NULL THEN " + SystemConstant.UPDATETIME);
-            sb.append("  WHEN " + SystemConstant.CREATETIME + " IS NOT NULL THEN " + SystemConstant.CREATETIME + " ELSE '19710101000000' END AS " + ZipperFieldEnum.S_START_TIME.getCode());
+            if (flag)
+                sb.append(" ,CASE ");
+            if (updateTimes != null && updateTimes.length > 0) {
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                }
+            }
+            if (createTimes != null && createTimes.length > 0) {
+                for (String createTime : createTimes) {
+                    String newCreateTime = dealTime(createTime);
+                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+                }
+            }
+            if (flag)
+                sb.append(" ELSE '19710101000000' END AS " + ZipperFieldEnum.S_START_TIME.getCode());
+            else
+                sb.append(" '19710101000000' AS " + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" ," + CommonFieldEnum.S_SRC.getCode());
@@ -404,7 +443,7 @@ public class OdsToDwdSqlService {
             sb.append(" OR      " + AddFieldEnum.S_ACTION.getCode() +" = 'insert' ");
             sb.append("         ; ");
             sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + ";");
-        } else  {
+        } else if (isZipper == 2){
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
             sb.append(" SELECT *,row_number() over (partition by id order by max_ds desc) as rm FROM ");
             sb.append("         ( ");
@@ -471,14 +510,19 @@ public class OdsToDwdSqlService {
             sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() + " = tb_update." + CommonFieldEnum.S_KEY.getCode());
             sb.append(" UNION ");
             sb.append(" SELECT  di." + CommonFieldEnum.S_KEY.getCode());
-            sb.append(columns.replace(",record.s_sdt", "").replace(",record.S_SDT", "").replace("record.", "di."));
-            sb.append("        ,tb_update.max_s_sdt as s_sdt ");
+            sb.append(columns.replace(",record.s_sdt", ",record.max_s_sdt as s_sdt ").replace(",record.S_SDT", ",record.max_s_sdt as s_sdt ").replace("record.", "di."));
             sb.append(",CASE ");
-            if (noHeadColumns.contains(SystemConstant.UPDATETIME)) {
-                sb.append(" WHEN tb_update.action = 'insert' and tb_update." + SystemConstant.UPDATETIME + " IS NOT NULL THEN tb_update." + SystemConstant.UPDATETIME);
+            if (updateTimes != null && updateTimes.length > 0) {
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN tb_update.action = 'insert' and tb_update." + newUpdateTime + " IS NOT NULL THEN tb_update." + newUpdateTime);
+                }
             }
-            if (noHeadColumns.contains(SystemConstant.CREATETIME)) {
-                sb.append("  WHEN tb_update.action = 'insert' AND tb_update." + SystemConstant.CREATETIME + " IS NOT NULL THEN tb_update." + SystemConstant.CREATETIME);
+            if (createTimes != null && createTimes.length > 0) {
+                for (String createTime : createTimes) {
+                    String newCreateTime = dealTime(createTime);
+                    sb.append("  WHEN tb_update.action = 'insert' AND tb_update." + newCreateTime + " IS NOT NULL THEN tb_update." + newCreateTime);
+                }
             }
             sb.append("  WHEN tb_update.action = 'insert' THEN '19710101000000' ");
             sb.append(" ELSE tb_update.max_s_sdt ");

@@ -67,7 +67,21 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
         queryWrapper.eq("belong_to", belongTo);
         this.baseMapper.delete(queryWrapper);
         SysDict zipper = sysDictService.findSysDict(dwdSysCode, "is_zipper", belongTo);
+        String[] isZipper = null;
+        if (zipper != null && zipper.getValue() != null)
+            isZipper = zipper.getValue().split(",");
         SysDict dwdCodes = sysDictService.findSysDict(dwdSysCode, "sys_code", belongTo);
+        String[] dwdCode = null;
+        if (dwdCodes != null && dwdCodes.getValue() != null)
+            dwdCode = dwdCodes.getValue().split(",");
+        SysDict tableCreateTime = sysDictService.findSysDict(dwdSysCode, "table_create_time", belongTo);
+        String[] tableCreateTimes = null;
+        if (tableCreateTime != null && tableCreateTime.getValue() != null)
+            tableCreateTimes = tableCreateTime.getValue().split(",");
+        SysDict tableUpdateTime = sysDictService.findSysDict(dwdSysCode, "table_update_time", belongTo);
+        String[] tableUpdateTimes = null;
+        if (tableUpdateTime != null && tableUpdateTime.getValue() != null)
+            tableUpdateTimes = tableUpdateTime.getValue().split(",");
         int start = -1;
         while (index < sheets) {
             ImportParams importParams = new ImportParams();
@@ -93,17 +107,17 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 String dwdTableNameCnF = "";
                 //根据表名的最后一位判断表是事实表还是维度表,如果是事实表生成事实表全量名
                 String info = odsTableName.substring(odsTableName.length() - 1);
-                String[] isZipper = null;
-                if (zipper != null && zipper.getValue() != null)
-                    isZipper = zipper.getValue().split(",");
                 start++;
-                Integer isZ = isZipper == null ? 1 : start < isZipper.length ? Integer.parseInt(isZipper[start]) : 1;
+                Integer isZ = isZipper == null ? 2 : start < isZipper.length ? Integer.parseInt(isZipper[start]) : 2;
                 String[] s = odsTableName.split("_");
                 StringBuilder suffixName = new StringBuilder();
-                String[] dwdCode = null;
-                if (dwdCodes != null && dwdCodes.getValue() != null)
-                    dwdCode = dwdCodes.getValue().split(",");
                 suffixName.append("_" + dwdSysCode + (dwdCode == null ? "" : (start < dwdCode.length ? dwdCode[start] : "")));
+                String[] createTimes = null;
+                if (tableCreateTimes != null && start < tableCreateTimes.length && StringUtils.isNotBlank(tableCreateTimes[start]))
+                    createTimes = tableCreateTimes[start].split("\\/");
+                String[] updateTimes = null;
+                if (tableUpdateTimes != null && start < tableUpdateTimes.length && StringUtils.isNotBlank(tableUpdateTimes[start]))
+                    updateTimes = tableUpdateTimes[start].split("\\/");
                 for(int i = 2; i < s.length; i++)
                     suffixName.append("_" + s[i]);
                 if (SystemConstant.ADD_TABLE.equals(info)) {
@@ -128,11 +142,11 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 if (SystemConstant.ADD_TABLE.equals(info)) {
                     sqlInfo.setDwdSqlAdd(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD, isZ));
                     sqlInfo.setDwdSqlAddMysql(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD, isZ));
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.ADD_TABLE, isZ, odsPrefix));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.ADD_TABLE, isZ, odsPrefix));
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.ADD_TABLE, isZ, odsPrefix, createTimes, updateTimes));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.ADD_TABLE, isZ, odsPrefix, createTimes, updateTimes));
                 } else {
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.FULL_TABLE, isZ, odsPrefix));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.FULL_TABLE, isZ, odsPrefix));
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.FULL_TABLE, isZ, odsPrefix, createTimes, updateTimes));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, SystemConstant.FULL_TABLE, isZ, odsPrefix, createTimes, updateTimes));
                 }
                 sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD, isZ));
                 sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD, isZ));
