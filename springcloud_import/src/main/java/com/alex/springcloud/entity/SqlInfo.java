@@ -85,7 +85,11 @@ public class SqlInfo {
     @TableField(value = "sys_code")
     private String sysCode;
 
-    @ApiModelProperty(value = "belongTo", name = "属于", example = "kobe")
+    @ApiModelProperty(value = "belongTo", name = "属于", example = "lihua")
     @TableField(value = "belong_to")
     private String belongTo;
+
+    @ApiModelProperty(value = "odsTestSql", name = "ods测试sql", example = "")
+    @TableField(value = "ods_test_sql")
+    private String odsTestSql;
 }

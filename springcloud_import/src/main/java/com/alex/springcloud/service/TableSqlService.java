@@ -24,12 +24,11 @@ public class TableSqlService {
      * @param type           类型（拉链）
      * @param database       数据库类型（mysql，max_compute）
      * @param level           层级（ods,dwd,dws,ads）
-     * @param isZ            是否是拉链表
      * @description:         生成创建表的sql语句
      * @author: alex
      * @return: java.lang.String
      */
-    public String setSql(List<SqlInfoImport> list, String tableName, String tableNameCn, String type, String database, String level, Integer isZ) {
+    public String setSql(List<SqlInfoImport> list, String tableName, String tableNameCn, String type, String database, String level) {
         if (list == null || list.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();

@@ -35,7 +35,9 @@ public class SystemConstant {
 
     //分区时间变量
     //public static final String CURTIME = "${curTime}";
-    public static final String CURTIME = "${bdp.system.bizdate}";
+    public static final String YESTERDAY = "${yesterday}";
+
+    public static final String TWO_DAYS_AGO = "${twodaysago}";
 
     //sql常量
     //增量
@@ -53,10 +55,19 @@ public class SystemConstant {
     //maxCompute sql
     public static final String MAX_COMPUTE = "max_compute";
 
-    //表更新类型
+    //表同步方式
     public static final String ADD_CN = "增量";
 
     public static final String FULL_CN = "全量";
+
+    public static final String HAND_CN = "手动维护";
+
+    //表类型
+    public static final String DIMENSION_TABLE = "维度表";
+
+    public static final String FACT_TABLE = "事实表";
+
+    public static final String DICTIONARY_TABLE = "字典表";
 
     public static final String ADD_TABLE = "i";
 
