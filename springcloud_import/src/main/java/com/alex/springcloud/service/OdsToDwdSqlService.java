@@ -46,7 +46,7 @@ public class OdsToDwdSqlService {
     }
 
     /**
-     * @param noHeadColumns     无表头列信息（id,..）
+     * @param noHeadColumns     无表头列信息（xxx,..）
      * @param odsTableName      ods表名
      * @param dwdTableNameF     dwd全量表名
      * @param sysCode           系统编号（ods表名ods_后到下一个_的数据）
@@ -96,7 +96,7 @@ public class OdsToDwdSqlService {
     }
 
     /**
-     * @param noHeadColumns    无表头列信息（id,..）
+     * @param noHeadColumns    无表头列信息（xxx,..）
      * @param odsTableName     ods表名
      * @param dwdTableNameI    dwd增量事实表名
      * @param dwdTableNameF    dwd全量事实表名
@@ -243,7 +243,7 @@ public class OdsToDwdSqlService {
     }
 
     /**
-     * @param columns         有表头列信息（record.id,..）
+     * @param columns         有表头列信息（record.xxx,..）
      * @param noHeadColumns   ods表名
      * @param odsTableName    dwd增量事实表名
      * @param dwdTableNameF   dwd全量事实表名
@@ -259,7 +259,7 @@ public class OdsToDwdSqlService {
         sb.append(" WITH at_" + odsTableName + " AS ( ");
         sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_'," + firstColumn + ") as " + CommonFieldEnum.S_KEY.getCode() + ",");
         sb.append(noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", "").substring(1));
-        sb.append(",cnt, max_s_sdt, max_ds, row_number() over (partition by id order by max_ds desc) as rm FROM ");
+        sb.append(",cnt, max_s_sdt, max_ds, row_number() over (partition by " + firstColumn + " order by max_ds desc) as rm FROM ");
         sb.append(" ( ");
         sb.append("         SELECT ");
         sb.append(noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", "").substring(1));
@@ -304,13 +304,13 @@ public class OdsToDwdSqlService {
         if (updateTimes != null && updateTimes.length > 0) {
             for (String updateTime : updateTimes) {
                 String newUpdateTime = dealTime(updateTime);
-                sb.append(" WHEN record.rm=1 and tb_update.id IS NOT NULL and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
             }
         }
-        sb.append(" WHEN record.rm=1 and tb_update.id IS NOT NULL THEN tb_update.max_s_sdt ");
+        sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL THEN tb_update.max_s_sdt ");
         sb.append(" ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
         sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
-        sb.append("        ,CASE    WHEN record.rm=1 and tb_update.id IS NOT NULL THEN '0' ");
+        sb.append("        ,CASE    WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL THEN '0' ");
         sb.append(" ELSE " + ZipperFieldEnum.S_STAT.getCode());
         sb.append(" END AS " + ZipperFieldEnum.S_STAT.getCode());
         sb.append("        ,record." + CommonFieldEnum.S_SRC.getCode());
@@ -356,8 +356,8 @@ public class OdsToDwdSqlService {
     }
 
     /**
-     * @param columns          有表头列信息（record.id,..）
-     * @param noHeadColumns    无表头列信息（id,..）
+     * @param columns          有表头列信息（record.xxx,..）
+     * @param noHeadColumns    无表头列信息（xxx,..）
      * @param odsTableName     ods表名
      * @param dwdTableNameI    dwd增量事实表名
      * @param dwdTableNameF    dwd全量事实表名
@@ -374,7 +374,7 @@ public class OdsToDwdSqlService {
             boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
             sb.append(" SELECT  * ");
-            sb.append(" ,ROW_NUMBER() OVER (PARTITION BY id ORDER BY max_ds DESC) AS rm ");
+            sb.append(" ,ROW_NUMBER() OVER (PARTITION BY " + firstColumn + " ORDER BY max_ds DESC) AS rm ");
             sb.append(" FROM    ( ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns.replace(",s_sdt", "").replace("S_SDT", ""));
@@ -388,7 +388,7 @@ public class OdsToDwdSqlService {
             sb.append(" FROM    " + odsPrefix + "." + odsTableName );
             sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "'");
             sb.append(" UNION ALL ");
-            sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_',id) AS " + CommonFieldEnum.S_KEY.getCode());
+            sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_'," + firstColumn + ") AS " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM    " + odsPrefix +  "." + odsTableName);
@@ -446,13 +446,13 @@ public class OdsToDwdSqlService {
             if (flag && updateTimes != null && updateTimes.length > 0) {
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
-                    sb.append(" WHEN record.rm=1 AND tb_update.id IS NOT NULL AND " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                    sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
                 }
             }
-            sb.append(" WHEN record.rm=1 AND tb_update.id IS NOT NULL THEN tb_update.max_s_sdt ");
+            sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL THEN tb_update.max_s_sdt ");
             sb.append(" ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
-            sb.append(" ,CASE    WHEN record.rm=1 AND tb_update.id IS NOT NULL THEN '0' ");
+            sb.append(" ,CASE    WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL THEN '0' ");
             sb.append(" ELSE " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" ,record." + CommonFieldEnum.S_SRC.getCode());
@@ -487,7 +487,7 @@ public class OdsToDwdSqlService {
             sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + " ; ");
         } else if (SystemConstant.ADD_CN.equals(tableSysnWay)){
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
-            sb.append(" SELECT *,row_number() over (partition by id order by max_ds desc) as rm FROM ");
+            sb.append(" SELECT *,row_number() over (partition by " + firstColumn + " order by max_ds desc) as rm FROM ");
             sb.append("         ( ");
             sb.append("                 SELECT " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
             sb.append("                 ,count(1) as cnt,MAX(s_sdt) as max_s_sdt,MAX(ds) as max_ds ");
@@ -536,10 +536,10 @@ public class OdsToDwdSqlService {
             sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
             sb.append("        ,record." + ZipperFieldEnum.S_START_TIME.getCode());
-            sb.append("         ,CASE    WHEN record.rm=1 and tb_update.id IS NOT NULL THEN tb_update.max_s_sdt ");
+            sb.append("         ,CASE    WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL THEN tb_update.max_s_sdt ");
             sb.append(" ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
-            sb.append("         ,CASE    WHEN record.rm=1 and tb_update.id IS NOT NULL THEN '0' ");
+            sb.append("         ,CASE    WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL THEN '0' ");
             sb.append(" ELSE " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append("         ,record." + CommonFieldEnum.S_SRC.getCode());
