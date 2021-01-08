@@ -162,6 +162,9 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)){
                     sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
                     sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
+                } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)) {
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
                 }
                 sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
                 sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
