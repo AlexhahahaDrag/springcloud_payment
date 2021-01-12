@@ -556,7 +556,7 @@ public class OdsToDwdSqlService {
             if (flag && updateTimes != null && updateTimes.length > 0) {
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
-                    sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND " + newUpdateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE(" + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss' ) ");
+                    sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND record." + newUpdateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE(record." + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss' ) ");
                 }
             }
             sb.append(" WHEN record.rm=1 AND tb_update.id IS NOT NULL THEN tb_update.max_s_sdt ");
