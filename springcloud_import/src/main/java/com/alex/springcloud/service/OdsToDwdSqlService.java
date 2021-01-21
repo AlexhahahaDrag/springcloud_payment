@@ -67,12 +67,12 @@ public class OdsToDwdSqlService {
         if (updateTimes != null && updateTimes.length > 0)
             for (String updateTime : updateTimes) {
                 String newUpdateTime = dealTime(updateTime);
-                sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
             }
         if (createTimes != null && createTimes.length > 0)
             for (String createTime : createTimes) {
                 String newCreateTime = dealTime(createTime);
-                sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+                sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
             }
         if (flag) {
             sb.append(" ELSE '19710101000000'");
@@ -137,12 +137,12 @@ public class OdsToDwdSqlService {
             if (updateTimes != null && updateTimes.length > 0)
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
-                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
                 }
             if (createTimes != null && createTimes.length > 0)
                 for (String createTime : createTimes) {
                     String newCreateTime = dealTime(createTime);
-                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyy-mm-dd hh:mi:ss'),'yyyymmddhhmiss') ");
                 }
             if (flag) {
                 sb.append(" ELSE '19710101000000'");
@@ -502,7 +502,7 @@ public class OdsToDwdSqlService {
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM " + dwdTableNameF);
-            sb.append(" WHERE   ds = ' " + SystemConstant.TWO_DAYS_AGO + "' ");
+            sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "' ");
             sb.append(" AND     s_stat = '1' ");
             sb.append(" UNION ALL ");
             sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_'," + firstColumn + ") AS " + CommonFieldEnum.S_KEY.getCode());
