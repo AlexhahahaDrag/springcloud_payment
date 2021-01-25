@@ -92,4 +92,12 @@ public class SqlInfo {
     @ApiModelProperty(value = "odsTestSql", name = "ods测试sql", example = "")
     @TableField(value = "ods_test_sql")
     private String odsTestSql;
+
+    @ApiModelProperty(value = "sqlZipperGreenplumName", name = "greenplum zipper sql name", example = "1")
+    @TableField(value = "sql_zipper_greenplum_name")
+    private String sqlZipperGreenplumName;
+
+    @ApiModelProperty(value = "sqlZipperGreenplum", name = "greenplum zipper sql", example = "1")
+    @TableField(value = "sql_zipper_greenplum")
+    private String sqlZipperGreenplum;
 }

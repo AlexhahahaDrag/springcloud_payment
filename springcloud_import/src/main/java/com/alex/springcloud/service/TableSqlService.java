@@ -75,4 +75,35 @@ public class TableSqlService {
         }
         return stringBuilder.toString();
     }
+
+    public String setGreenplumSql(List<SqlInfoImport> list, String greenTableName, String greenTableNameCn) {
+        if (list == null || list.size() == 0)
+            return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append(" DROP TABLE IF EXISTS \"dwd\".\"" + greenTableName + "\"; ");
+        sb.append(" CREATE TABLE \"dwd\".\"" + greenTableName + "\" ( ");
+        sb.append(" \"" + CommonFieldEnum.S_KEY.getCode() + "\" varchar(2000), ");
+        for (SqlInfoImport sqlInfoImport : list) {
+            switch (sqlInfoImport.getColumnType().toLowerCase()) {
+                case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" int8, "); break;
+                case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" float8, "); break;
+                default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar(2000), ");
+            }
+        }
+        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet())
+            sb.append(" \"" + entry.getKey() + "\" varchar(32), ");
+        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet())
+            sb.append(" \"" + entry.getKey() + "\" varchar(2000) ");
+        sb.append(" ); ");
+        sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + CommonFieldEnum.S_KEY.getCode() + "\" IS '" + CommonFieldEnum.S_KEY.getComment() + "'; ");
+        for (SqlInfoImport sqlInfoImport : list) {
+            sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + sqlInfoImport.getColumn() + "\" IS '" + sqlInfoImport.getColumnName() + "'; ");
+        }
+        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet())
+            sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + entry.getKey() + "\" IS '" + entry.getValue() + "'; ");
+        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet())
+            sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + entry.getKey() + "\" IS '" + entry.getValue() + "'; ");
+        sb.append(" COMMENT ON TABLE \"dwd\".\"" + greenTableName + "\" IS '" + greenTableNameCn + "'; ");
+        return sb.toString();
+    }
 }

@@ -44,4 +44,10 @@ public class GatherImportInfo {
 
     @Excel(name = "同步频率")
     private String sysnRate;
+
+    @Excel(name = "gp表名")
+    private String greenTableName;
+
+    @Excel(name = "gp表名中文")
+    private String greenTableNameCn;
 }

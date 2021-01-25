@@ -95,6 +95,9 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 //dwd表全量名
                 String dwdTableNameF = "";
                 String dwdTableNameCnF = "";
+                //greenplum表名
+                String greenTableName = "";
+                String greenTableNameCn = "";
                 //表类型
                 String tableType = "";
                 //表同步方式
@@ -146,12 +149,15 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                     dwdTableNameF = SystemConstant.DIM + suffixName.toString();
                     dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
                 }
+                greenTableName = StringUtils.isEmpty(gatherImportInfo.getGreenTableName()) ? dwdTableNameF : gatherImportInfo.getGreenTableName();
+                greenTableNameCn = StringUtils.isEmpty(gatherImportInfo.getGreenTableNameCn()) ? dwdTableNameCnF : gatherImportInfo.getGreenTableNameCn();
                 sqlInfo.setDwdZipperTableName(dwdTableNameF);
                 sqlInfo.setDwdAddTableName(dwdTableNameI);
                 sqlInfo.setTableName(odsTableName);
                 sqlInfo.setTableNameCn(odsTableNameCn);
                 sqlInfo.setSysCode(dwdSysCode);
                 sqlInfo.setBelongTo(belongTo);
+                sqlInfo.setSqlZipperGreenplumName(greenTableName);
                 sqlInfo.setOdsSql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.ODS));
                 sqlInfo.setOdsSqlMysql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.ODS));
                 if (SystemConstant.FACT_TABLE.equals(tableType)) {
@@ -168,6 +174,7 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 }
                 sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
                 sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
+                sqlInfo.setSqlZipperGreenplum(tableSqlService.setGreenplumSql(result.getList(), greenTableName, greenTableNameCn));
                 sqlInfo.setOdsTestSql(odsTestSqlService.setOdsTestSql(result.getList(), odsTableName));
                 list.add(sqlInfo);
             }
