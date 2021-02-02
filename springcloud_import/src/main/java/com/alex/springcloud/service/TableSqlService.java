@@ -84,7 +84,7 @@ public class TableSqlService {
         sb.append(" CREATE TABLE \"dwd\".\"" + greenTableName + "\" ( ");
         sb.append(" \"" + CommonFieldEnum.S_KEY.getCode() + "\" varchar(2000), ");
         for (SqlInfoImport sqlInfoImport : list) {
-            switch (sqlInfoImport.getColumnType().toLowerCase()) {
+            switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
                 case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" int8, "); break;
                 case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" float8, "); break;
                 default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar(2000), ");
