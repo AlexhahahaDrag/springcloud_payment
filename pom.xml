@@ -47,7 +47,6 @@
         <module>cloud_rabbitmq9010</module>
         <module>docker-compose-test</module>
         <module>aliyun_maxcompute</module>
-        <module>springcloud_shiro</module>
         <module>springcloud_import</module>
     </modules>
 
