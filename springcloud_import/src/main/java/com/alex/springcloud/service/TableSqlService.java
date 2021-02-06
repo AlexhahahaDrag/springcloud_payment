@@ -82,18 +82,18 @@ public class TableSqlService {
         StringBuilder sb = new StringBuilder();
         sb.append(" DROP TABLE IF EXISTS \"dwd\".\"" + greenTableName + "\"; ");
         sb.append(" CREATE TABLE \"dwd\".\"" + greenTableName + "\" ( ");
-        sb.append(" \"" + CommonFieldEnum.S_KEY.getCode() + "\" varchar(2000), ");
+        sb.append(" \"" + CommonFieldEnum.S_KEY.getCode() + "\" varchar, ");
         for (SqlInfoImport sqlInfoImport : list) {
             switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
-                case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" int8, "); break;
-                case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" float8, "); break;
-                default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar(2000), ");
+                case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" bigint, "); break;
+                case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" double precision, "); break;
+                default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar, ");
             }
         }
         for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet())
-            sb.append(" \"" + entry.getKey() + "\" varchar(32), ");
+            sb.append(" \"" + entry.getKey() + "\" varchar, ");
         for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet())
-            sb.append(" \"" + entry.getKey() + "\" varchar(2000) ");
+            sb.append(" \"" + entry.getKey() + "\" varchar ");
         sb.append(" ); ");
         sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + CommonFieldEnum.S_KEY.getCode() + "\" IS '" + CommonFieldEnum.S_KEY.getComment() + "'; ");
         for (SqlInfoImport sqlInfoImport : list) {

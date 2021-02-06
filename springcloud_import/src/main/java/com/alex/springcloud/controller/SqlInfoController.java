@@ -1,6 +1,8 @@
 package com.alex.springcloud.controller;
 
+import com.alex.springcloud.entity.GPSqlInfo;
 import com.alex.springcloud.entity.SqlInfo;
+import com.alex.springcloud.service.GPSqlInfoService;
 import com.alex.springcloud.service.SqlInfoService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class SqlInfoController {
     @Autowired
     private SqlInfoService sqlInfoService;
 
+    @Autowired
+    private GPSqlInfoService gpSqlInfoService;
+
     @ApiOperation(value = "客户信息批量导入", httpMethod = "POST", notes = "客户信息批量导入", produces = "application/json; charset=utf-8")
     @PostMapping("/import")
     public List<SqlInfo> importItemDetail(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
@@ -31,5 +36,14 @@ public class SqlInfoController {
                                           @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
                                           @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
         return sqlInfoService.importInfo(file, startSheet, dwdSysCode, odsPrefix, belongTo);
+    }
+
+    @ApiOperation(value = "创建gp建表语句", httpMethod = "POST", notes = "批量创建gp建表语句", produces = "application/json; charset=utf-8")
+    @PostMapping("/createGPsql")
+    public List<GPSqlInfo> importItemDetail(@ApiParam(value = "汇总表", required = true) @RequestBody MultipartFile file,
+                                            @ApiParam(value = "schema名", defaultValue = "", example = "302") @RequestParam(name="schema", required = false, defaultValue = "") String schema,
+                                            @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
+                                            @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
+        return gpSqlInfoService.importGPInfo(file, schema, startSheet, belongTo);
     }
 }
