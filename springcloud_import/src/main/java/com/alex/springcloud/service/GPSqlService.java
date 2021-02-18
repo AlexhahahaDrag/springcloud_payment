@@ -33,6 +33,7 @@ public class GPSqlService {
             switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
                 case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" bigint, "); break;
                 case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" double precision, "); break;
+                case "timestamp" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" timestamp, "); break;
                 default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar, ");
             }
         }
