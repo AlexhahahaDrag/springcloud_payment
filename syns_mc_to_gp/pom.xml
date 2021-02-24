@@ -9,14 +9,38 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>springcloud_imoport</artifactId>
+    <artifactId>syns_mc_to_gp</artifactId>
 
     <dependencies>
+        <!--aliyun sdk-->
+        <dependency>
+            <groupId>com.aliyun.odps</groupId>
+            <artifactId>odps-sdk-core</artifactId>
+            <version>0.36.4-public</version>
+        </dependency>
+
+        <!--aliyun jdbc-->
+        <dependency>
+            <groupId>com.aliyun.odps</groupId>
+            <artifactId>odps-jdbc</artifactId>
+            <version>3.2.8</version>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
+
+        <!--lombok-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!--gp database-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
@@ -27,16 +51,13 @@
             <artifactId>druid</artifactId>
             <version>${druid.version}</version>
         </dependency>
-        <!--mysql-connector-java-->
-<!--        <dependency>-->
-<!--            <groupId>mysql</groupId>-->
-<!--            <artifactId>mysql-connector-java</artifactId>-->
-<!--        </dependency>-->
+
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>${mybatisplus.version}</version>
         </dependency>
+
         <!--swagger-->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -53,32 +74,30 @@
             <artifactId>springfox-spring-webmvc</artifactId>
             <version>${swagger.version}</version>
         </dependency>
+
         <!--web-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--easypoi-->
+
+        <!--mybatis plus-->
         <dependency>
-            <groupId>cn.afterturn</groupId>
-            <artifactId>easypoi-base</artifactId>
-            <version>${easypoi.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatisplus.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>cn.afterturn</groupId>
-            <artifactId>easypoi-web</artifactId>
-            <version>${easypoi.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <version>3.4.1</version>
         </dependency>
+
         <dependency>
-            <groupId>cn.afterturn</groupId>
-            <artifactId>easypoi-annotation</artifactId>
-            <version>${easypoi.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.factcast/factcast-store-pgsql -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.31</version>
         </dependency>
     </dependencies>
 </project>
