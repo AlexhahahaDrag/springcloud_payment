@@ -12,9 +12,9 @@ public class DownloadMc {
 
     private static final String DRIVER_NAME = "com.aliyun.odps.jdbc.OdpsDriver";
 
-    private static final String accessId = "b4A50gIMQQ9gFsB8";
-    private static final String accessKey = "yAPrlxsCLfOgx40NJQgKGTIF9wJM4G";
-    private static final String url = "jdbc:odps:http://service.cn-chongqing-cqdxz-d01.odps.ops.swy.cncqsw.com:80/api?project=PRJ_201_DW_DEV";
+    private static final String ACCESS_ID = "b4A50gIMQQ9gFsB8";
+    private static final String ACCESS_KEY = "yAPrlxsCLfOgx40NJQgKGTIF9wJM4G";
+    private static final String URL = "jdbc:odps:http://service.cn-chongqing-cqdxz-d01.odps.ops.swy.cncqsw.com:80/api?project=PRJ_201_DW_DEV";
 
 
     public static void main(String[] args) throws Exception {
@@ -25,8 +25,8 @@ public class DownloadMc {
             System.exit(1);
         }
         Connection conn = DriverManager.getConnection(
-                url,
-                accessId, accessKey);
+                URL,
+                ACCESS_ID, ACCESS_KEY);
         Statement stmt = conn.createStatement();
         String sql = "SELECT * FROM dim_201_org_5mmf where ds = (select max(ds) from dim_201_org_5mmf)";
         stmt.executeQuery(sql);

@@ -22,7 +22,7 @@ public class ShiroRealm extends AuthorizingRealm {
 
     @Override
     public boolean supports(AuthenticationToken token) {
-        return token instanceof JWTToken;
+        return token instanceof JwtToken;
     }
 
     /**
@@ -33,7 +33,7 @@ public class ShiroRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection token) {
-        String username = JWTUtil.getUsername(token.toString());
+        String username = JwtUtil.getUsername(token.toString());
         User user = SystemUtils.getUser(username);
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         //获取用户角色集
@@ -52,15 +52,18 @@ public class ShiroRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         String token = (String) authenticationToken.getCredentials();
-        String username = JWTUtil.getUsername(token);
-        if (StringUtils.isBlank(username))
+        String username = JwtUtil.getUsername(token);
+        if (StringUtils.isBlank(username)) {
             throw new AuthenticationException("token校验不通过");
+        }
         //通过用户名查询用户信息
         User user = SystemUtils.getUser(username);
-        if (user == null)
+        if (user == null) {
             throw new AuthenticationException("用户名和密码错误");
-        if (!JWTUtil.verify(token, username, user.getPassword()))
+        }
+        if (!JwtUtil.verify(token, username, user.getPassword())) {
             throw new AuthenticationException("token校验不通过");
+        }
         return new SimpleAuthenticationInfo(token, token, "shiro_realm");
     }
 }

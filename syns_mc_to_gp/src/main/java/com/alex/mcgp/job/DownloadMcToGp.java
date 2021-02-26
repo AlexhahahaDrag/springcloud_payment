@@ -17,15 +17,15 @@ import java.util.UUID;
 
 public class DownloadMcToGp {
 
-    private static final String accessId = "b4A50gIMQQ9gFsB8";
-    private static final String accessKey = "yAPrlxsCLfOgx40NJQgKGTIF9wJM4G";
-    private static final String endPoint = "http://service.cn-chongqing-cqdxz-d01.odps.ops.swy.cncqsw.com:80/api";
-    private static final String project = "PRJ_201_DW_DEV";
-    private static final String sql = "select * from dim_201_org_5mmf where ds = (select max(ds) from dim_201_org_5mmf);";
-    private static final String table = "Tmp_" + UUID.randomUUID().toString().replace("-", "_");//此处使用随机字符串作为临时导出存放数据的表的名字。
+    private static final String ACCESS_ID = "b4A50gIMQQ9gFsB8";
+    private static final String ACCESS_KEY = "yAPrlxsCLfOgx40NJQgKGTIF9wJM4G";
+    private static final String END_POINT = "http://service.cn-chongqing-cqdxz-d01.odps.ops.swy.cncqsw.com:80/api";
+    private static final String PROJECT = "PRJ_201_DW_DEV";
+    private static final String SQL = "select * from dim_201_org_5mmf where ds = (select max(ds) from dim_201_org_5mmf);";
+    private static final String TABLE = "Tmp_" + UUID.randomUUID().toString().replace("-", "_");//此处使用随机字符串作为临时导出存放数据的表的名字。
     private static final Odps odps = getOdps();
     public static void main(String[] args) {
-        System.out.println(table);
+        System.out.println(TABLE);
         runSql();
         tunnel();
     }
@@ -35,7 +35,7 @@ public class DownloadMcToGp {
     private static void tunnel() {
         TableTunnel tunnel = new TableTunnel(odps);
         try {
-            TableTunnel.DownloadSession downloadSession = tunnel.createDownloadSession(project, table);
+            TableTunnel.DownloadSession downloadSession = tunnel.createDownloadSession(PROJECT, TABLE);
             System.out.println("Session Status is : "+ downloadSession.getStatus().toString());
             long count = downloadSession.getRecordCount();
             System.out.println("RecordCount is: " + count);
@@ -64,8 +64,8 @@ public class DownloadMcToGp {
      * */
     private static void runSql() {
         Instance i;
-        StringBuilder sb = new StringBuilder("Create Table ").append(table)
-                .append(" lifecycle 1 as ").append(sql);
+        StringBuilder sb = new StringBuilder("Create Table ").append(TABLE)
+                .append(" lifecycle 1 as ").append(SQL);
         try {
             System.out.println(sb.toString());
             i = SQLTask.run(getOdps(), sb.toString());
@@ -78,10 +78,10 @@ public class DownloadMcToGp {
      * 初始化MaxCompute的连接信息。
      * */
     private static Odps getOdps() {
-        Account account = new AliyunAccount(accessId, accessKey);
+        Account account = new AliyunAccount(ACCESS_ID, ACCESS_KEY);
         Odps odps = new Odps(account);
-        odps.setEndpoint(endPoint);
-        odps.setDefaultProject(project);
+        odps.setEndpoint(END_POINT);
+        odps.setDefaultProject(PROJECT);
         return odps;
     }
 }

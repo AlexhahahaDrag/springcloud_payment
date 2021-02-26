@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GPSqlInfoImport {
+public class GpSqlInfoImportBO {
 
     private String tableName;
 

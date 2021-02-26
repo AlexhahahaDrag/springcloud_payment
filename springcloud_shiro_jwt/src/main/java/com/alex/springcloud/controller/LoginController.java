@@ -1,10 +1,10 @@
 package com.alex.springcloud.controller;
 
-import com.alex.springcloud.authentication.JWTUtil;
+import com.alex.springcloud.authentication.JwtUtil;
 import com.alex.springcloud.domain.Response;
 import com.alex.springcloud.domain.User;
 import com.alex.springcloud.exception.SystemException;
-import com.alex.springcloud.utils.MD5Util;
+import com.alex.springcloud.utils.Md5Util;
 import com.alex.springcloud.utils.SystemUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -39,15 +39,17 @@ public class LoginController {
                           @RequestParam("password") String password,
                           HttpServletRequest request) throws Exception{
         username = StringUtils.lowerCase(username);
-        password = MD5Util.encrypt(username, password);
+        password = Md5Util.encrypt(username, password);
         User user = SystemUtils.getUser(username);
         final String errorMessage = "用户名或密码错误";
-        if (user == null)
+        if (user == null) {
             throw new SystemException(errorMessage);
-        if (!StringUtils.equals(user.getPassword(), password))
+        }
+        if (!StringUtils.equals(user.getPassword(), password)) {
             throw new SystemException(errorMessage);
+        }
         //生成token
-        String token = JWTUtil.sign(username, password);
+        String token = JwtUtil.sign(username, password);
         Map<String, Object> userInfo = this.generateUserInfo(token, user);
         return new Response().message("认证成功").data(userInfo);
     }
@@ -59,7 +61,7 @@ public class LoginController {
      * @return:
      */
     private Map<String, Object> generateUserInfo(String token, User user) {
-        Map<String, Object> userInfo = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>(1);
         userInfo.put("token", token);
         user.setPassword("it is a secret");
         userInfo.put("user", user);

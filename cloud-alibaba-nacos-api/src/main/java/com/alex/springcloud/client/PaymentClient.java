@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Component
 public interface PaymentClient {
 
+    /**
+     * @param id
+     * @description:
+     * @author: alex
+     * @return: com.alex.springcloud.entities.CommonResult<com.alex.springcloud.entities.Payment>
+     */
     @GetMapping(value = UrlRest.PAYMENT_GET_URL)
     CommonResult<Payment> getPaymentById(@PathVariable(value = "id") Long id);
 }

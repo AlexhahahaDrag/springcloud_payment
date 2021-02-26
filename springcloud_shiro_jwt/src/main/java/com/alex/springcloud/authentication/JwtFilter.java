@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * @createTime:  2020/11/13 15:27
  * @version:     1.0
  */
-public class JWTFilter extends BasicHttpAuthenticationFilter {
+public class JwtFilter extends BasicHttpAuthenticationFilter {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -36,13 +36,16 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
         String[] anonUrl = StringUtils.splitByWholeSeparatorPreserveAllTokens(properties.getAnonUrl(), ",");
         boolean match = false;
         for (String u : anonUrl) {
-            if (pathMatcher.match(u, httpServletRequest.getRequestURI()))
+            if (pathMatcher.match(u, httpServletRequest.getRequestURI())) {
                 match = true;
+            }
         }
-        if (match)
+        if (match) {
             return match;
-        if (isLoginAttempt(request, response))
+        }
+        if (isLoginAttempt(request, response)) {
             return executeLogin(request, response);
+        }
         return false;
     }
 
@@ -57,7 +60,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
     protected boolean executeLogin(ServletRequest request, ServletResponse response) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String token = httpServletRequest.getHeader(TOKEN);
-        JWTToken jwtToken = new JWTToken(token);
+        JwtToken jwtToken = new JwtToken(token);
         try{
             getSubject(request, response).login(jwtToken);
             return true;

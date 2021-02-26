@@ -10,6 +10,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${server.port}")
     private String port;
 
+    @Override
     public String getInfo() {
         return "alibaba nacos info port : " + port;
     }

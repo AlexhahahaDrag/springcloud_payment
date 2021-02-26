@@ -29,6 +29,8 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
     @Autowired
     private OdsTestSqlService odsTestSqlService;
 
+    @Autowired
+    private OldOdsToOdsSqlService odsToOdsSqlService;
     /**
      * @param file          导入的文件信息
      * @param index         开始识别的sheet页
@@ -38,10 +40,11 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.SqlInfo>
      */
-    public List<SqlInfo> importInfo(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo) throws Exception {
-        List<SqlInfo> sqlInfos = importSql(file, index, dwdSysCode, odsPrefix, belongTo);
-        if (sqlInfos != null && sqlInfos.size() > 0)
+    public List<SqlInfo> importInfo(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
+        List<SqlInfo> sqlInfos = importSql(file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase);
+        if (sqlInfos != null && sqlInfos.size() > 0) {
             this.saveBatch(sqlInfos);
+        }
         return sqlInfos;
     }
 
@@ -54,22 +57,26 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.SqlInfo>
      */
-    private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo) throws Exception {
+    private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
         List<GatherImportInfo> firstSheet = getFirstSheet(file);
-        if(file==null)
+        if(file==null) {
             throw new Exception("文件不能为空！");
+        }
         //首页不能为空
-        if (firstSheet == null || firstSheet.isEmpty())
-            throw new Exception("首页不能为空！");;
-        return getTableInfo(firstSheet, file, index, dwdSysCode, odsPrefix, belongTo);
+        if (firstSheet == null || firstSheet.isEmpty()) {
+            throw new Exception("首页不能为空！");
+        }
+        ;
+        return getTableInfo(firstSheet, file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase);
     }
 
-    private List<SqlInfo> getTableInfo(List<GatherImportInfo> firstSheet, MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo) throws Exception {
+    private List<SqlInfo> getTableInfo(List<GatherImportInfo> firstSheet, MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
         List<SqlInfo> list = new ArrayList<>();
         ExcelImportResult<SqlInfoImport> result;
         int sheets = Integer.MAX_VALUE;
-        if (index == null || index < 0)
+        if (index == null || index < 0) {
             index = 0;
+        }
         //物理删除之前创建的数据
         QueryWrapper<SqlInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("sys_code", dwdSysCode);
@@ -117,13 +124,16 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                     odsTableNameCn = gatherImportInfo.getTableNameCn();
                     suffixName.append("_" + dwdSysCode + (gatherImportInfo.getDwdTableNo() == null ? "" : gatherImportInfo.getDwdTableNo()));
                     String[] s = odsTableName.split("_");
-                    for(int i = 2; i < s.length; i++)
+                    for(int i = 2; i < s.length; i++) {
                         suffixName.append("_" + s[i]);
+                    }
                     if (SystemConstant.FACT_TABLE.equals(tableType) && SystemConstant.ADD_CN.equals(tableSysnWay)) {
-                        if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime()))
+                        if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime())) {
                             createTimes = gatherImportInfo.getCreateTime().split("\\/");
-                        if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime()))
+                        }
+                        if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime())) {
                             updateTimes = gatherImportInfo.getUpdateTime().split("\\/");
+                        }
                     }
                 }
                 if (SystemConstant.FACT_TABLE.equals(tableType)) {
@@ -176,6 +186,9 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
                 sqlInfo.setSqlZipperGreenplum(tableSqlService.setGreenplumSql(result.getList(), greenTableName, greenTableNameCn));
                 sqlInfo.setOdsTestSql(odsTestSqlService.setOdsTestSql(result.getList(), odsTableName));
+                if (StringUtils.isNotBlank(oldOdsDatabase)) {
+                    sqlInfo.setOldOdsToOldSql(odsToOdsSqlService.setOldOdsToOdsSql(result.getList(), odsPrefix, odsTableName, oldOdsPrefix, oldOdsDatabase, tableSysnWay));
+                }
                 list.add(sqlInfo);
             }
             index++;

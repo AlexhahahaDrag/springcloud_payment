@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @description:
+ * @author:      alex
+ * @createTime:  2021/2/26 15:01
+ * @version:     1.0
+ */
 @RestController
 @RequestMapping("/consumer")
 @EnableHystrix

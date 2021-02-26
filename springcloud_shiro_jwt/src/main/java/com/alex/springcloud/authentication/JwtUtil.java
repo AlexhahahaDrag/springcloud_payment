@@ -18,9 +18,9 @@ import java.util.Date;
  * @createTime:  2020/11/13 15:03
  * @version:     1.0
  */
-public class JWTUtil {
+public class JwtUtil {
 
-    private static Logger log = LoggerFactory.getLogger(JWTUtil.class);
+    private static Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
     private static final long EXPIRE_TIME = SpringContextUtil.getBean(SystemProperties.class).getJwtTimeOut() * 1000;
 

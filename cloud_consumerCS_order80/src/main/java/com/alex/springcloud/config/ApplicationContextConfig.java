@@ -5,6 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * @description:
+ * @author:      alex
+ * @createTime:  2021/2/26 15:01
+ * @version:     1.0
+ */
 @Configuration
 public class ApplicationContextConfig {
 

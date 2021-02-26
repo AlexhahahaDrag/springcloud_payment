@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * @description:
+ * @author:      alex
+ * @createTime:  2021/2/26 15:01
+ * @version:     1.0
+ */
 @RestController
 @Slf4j
 @RequestMapping("/consumer")

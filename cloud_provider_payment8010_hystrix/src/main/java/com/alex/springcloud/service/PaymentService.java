@@ -29,15 +29,17 @@ public class PaymentService {
     @HystrixCommand(fallbackMethod = "paymentInfo_NOT_NAGATIVE", commandProperties = {
             @HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds",value="5000")})       //失败率达到多少后跳闸
     public CommonResult<Payment> getPaymentTimeOut(Long id) throws Exception{
-        if (id < 0)
+        if (id < 0) {
             throw new Exception("id不能为负数");
+        }
         logger.info("调用getTimeOut");
         try { TimeUnit.MILLISECONDS.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
         Payment payment = paymentMapper.getPaymentById(id);
-        if (payment == null)
+        if (payment == null) {
             return new CommonResult<>(423, "id为" + id + "的单据不存在");
-        else
+        } else {
             return new CommonResult<>(200, "查询成功, port" + port , payment);
+        }
     }
 
     @HystrixCommand(fallbackMethod = "paymentInfo_NOT_NAGATIVE",commandProperties = {
@@ -47,22 +49,25 @@ public class PaymentService {
             @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage",value = "60"),// 失败率达到多少后跳闸
     })
     public CommonResult<Payment> getPayment(Long id) throws Exception{
-        if (id < 0)
+        if (id < 0) {
             throw new Exception("id不能为负数");
+        }
         logger.info("调用get");
        Payment payment = paymentMapper.getPaymentById(id);
-        if (payment == null)
+        if (payment == null) {
             return new CommonResult<>(423, "id为" + id + "的单据不存在");
-        else
+        } else {
             return new CommonResult<>(200, "查询成功, port" + port , payment);
+        }
     }
 
     public CommonResult<Integer> createPayment(Payment payment) {
         int num =  paymentMapper.createPayment(payment);
-        if (num > 0)
+        if (num > 0) {
             return new CommonResult<>(200, "创建成功", num);
-        else
+        } else {
             return new CommonResult<>(423, "创建失败", null);
+        }
     }
 
     public CommonResult<Payment> paymentInfo_TimeOutHandler(Long id) {

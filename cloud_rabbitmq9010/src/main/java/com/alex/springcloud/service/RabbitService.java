@@ -29,11 +29,11 @@ public class RabbitService {
                 user.setName("alex" + i);
                 user.setVersion(i);
                 rabbitTemplate.convertAndSend("alex.news", "/alex", user);
-                //log.info("发送信息{}成功", user);
+                log.info("发送信息{}成功", user);
             } else {
                 Customer customer = new Customer("tom" + i, null, i);
                 rabbitTemplate.convertAndSend("alex.news", "/alex", customer);
-                //log.info("发送信息{}成功", customer);
+                log.info("发送信息{}成功", customer);
             }
         }
     }

@@ -53,7 +53,8 @@ public class HtmlParseUtil {
 
     public static void main(String[] args) throws IOException {
         List<Info> contents = HtmlParseUtil.parseCamel("");
-        //List<Content> contents = HtmlParseUtil.parseJD("vue");
+        List<Content> contents11 = HtmlParseUtil.parseJD("vue");
         contents.forEach(System.out::println);
+        System.out.println(contents11);
     }
 }

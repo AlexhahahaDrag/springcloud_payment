@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
- *description:  consumer order 启动类
- *author:       alex
- *createDate:   2020/7/17 21:40
- *version:      1.0.0
+ * @description:
+ * @author:      alex
+ * @createTime:  2021/2/26 15:01
+ * @version:     1.0
  */
 @SpringBootApplication
 @EnableDiscoveryClient

@@ -1,6 +1,6 @@
 package com.alex.springcloud.mapper;
 
-import com.alex.springcloud.entity.GPSqlInfo;
+import com.alex.springcloud.entity.GpSqlInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,5 +9,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @createTime:  2021/2/6 11:38
  * @version:     1.0
  */
-public interface GPSqlInfoMapper extends BaseMapper<GPSqlInfo> {
+public interface GPSqlInfoMapper extends BaseMapper<GpSqlInfo> {
 }

@@ -29,8 +29,9 @@ public class TableSqlService {
      * @return: java.lang.String
      */
     public String setSql(List<SqlInfoImport> list, String tableName, String tableNameCn, String type, String database, String level) {
-        if (list == null || list.size() == 0)
+        if (list == null || list.size() == 0) {
             return "";
+        }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("CREATE TABLE IF NOT EXISTS `");
         stringBuilder.append(tableName +"` (");
@@ -40,6 +41,9 @@ public class TableSqlService {
             stringBuilder.append(" COMMENT '" + (CommonFieldEnum.S_KEY.getComment() == null ? "" : CommonFieldEnum.S_KEY.getComment()) + "',");
         }
         for (SqlInfoImport sqlInfoImport : list) {
+            if ("ODS标准层表字段英文名".equals(sqlInfoImport.getColumn())) {
+                break;
+            }
             stringBuilder.append("`" + sqlInfoImport.getColumn() + "` ");
             stringBuilder.append(sqlInfoImport.getColumnType() == null ? "string" : sqlInfoImport.getColumnType());
             stringBuilder.append(" COMMENT '" + (sqlInfoImport.getColumnName() == null ? "" : sqlInfoImport.getColumnName()) + "',");
@@ -77,32 +81,43 @@ public class TableSqlService {
     }
 
     public String setGreenplumSql(List<SqlInfoImport> list, String greenTableName, String greenTableNameCn) {
-        if (list == null || list.size() == 0)
+        if (list == null || list.size() == 0) {
             return "";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(" DROP TABLE IF EXISTS \"dwd\".\"" + greenTableName + "\"; ");
         sb.append(" CREATE TABLE \"dwd\".\"" + greenTableName + "\" ( ");
         sb.append(" \"" + CommonFieldEnum.S_KEY.getCode() + "\" varchar, ");
         for (SqlInfoImport sqlInfoImport : list) {
+            if ("ODS标准层表字段英文名".equals(sqlInfoImport.getColumn())) {
+                break;
+            }
             switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
                 case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" bigint, "); break;
                 case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" double precision, "); break;
                 default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar, ");
             }
         }
-        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet())
+        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet()) {
             sb.append(" \"" + entry.getKey() + "\" varchar, ");
-        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet())
+        }
+        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet()) {
             sb.append(" \"" + entry.getKey() + "\" varchar ");
+        }
         sb.append(" ); ");
         sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + CommonFieldEnum.S_KEY.getCode() + "\" IS '" + CommonFieldEnum.S_KEY.getComment() + "'; ");
         for (SqlInfoImport sqlInfoImport : list) {
+            if ("ODS标准层表字段英文名".equals(sqlInfoImport.getColumn())) {
+                break;
+            }
             sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + sqlInfoImport.getColumn() + "\" IS '" + sqlInfoImport.getColumnName() + "'; ");
         }
-        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet())
+        for(Map.Entry entry : SystemConstant.DWD_ZIPPER_TABLE.entrySet()) {
             sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + entry.getKey() + "\" IS '" + entry.getValue() + "'; ");
-        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet())
+        }
+        for (Map.Entry entry : SystemConstant.DWD_COMMON_TABLE.entrySet()) {
             sb.append(" COMMENT ON COLUMN \"dwd\".\"" + greenTableName + "\".\"" + entry.getKey() + "\" IS '" + entry.getValue() + "'; ");
+        }
         sb.append(" COMMENT ON TABLE \"dwd\".\"" + greenTableName + "\" IS '" + greenTableNameCn + "'; ");
         return sb.toString();
     }

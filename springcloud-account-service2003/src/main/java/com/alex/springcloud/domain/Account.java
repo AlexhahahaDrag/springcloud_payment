@@ -6,6 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * @description:
+ * @author:      alex
+ * @createTime:  2021/2/26 15:02
+ * @version:     1.0
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

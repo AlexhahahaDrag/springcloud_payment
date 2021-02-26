@@ -10,9 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @version:     1.0
  */
 @SpringBootApplication
-public class JDmain {
+public class JdMain {
 
     public static void main(String[] args) {
-        SpringApplication.run(JDmain.class, args);
+        SpringApplication.run(JdMain.class, args);
     }
 }

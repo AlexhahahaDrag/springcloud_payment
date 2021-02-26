@@ -10,5 +10,11 @@ import com.alex.springcloud.domain.Order;
  */
 public interface OrderService {
 
+    /**
+     * @param order
+     * @description:
+     * @author: alex
+     * @return: int
+     */
     int create(Order order);
 }

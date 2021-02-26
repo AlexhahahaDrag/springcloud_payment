@@ -5,5 +5,11 @@ import com.alex.springcloud.entities.Payment;
 
 public interface PaymentService {
 
+    /**
+     * @param id
+     * @description:
+     * @author: alex
+     * @return: com.alex.springcloud.entities.CommonResult<com.alex.springcloud.entities.Payment>
+     */
     CommonResult<Payment> getPayment(Long id);
 }

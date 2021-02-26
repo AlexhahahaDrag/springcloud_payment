@@ -7,6 +7,12 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface OrderMapper {
 
+    /**
+     * @param order
+     * @description:
+     * @author: alex
+     * @return: int
+     */
     int create(Order order);
 
     /**

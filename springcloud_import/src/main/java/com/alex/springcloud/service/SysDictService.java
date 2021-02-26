@@ -21,18 +21,21 @@ public class SysDictService {
 
     public SysDict findSysDict(String sysCode, String code, String belongTo) {
         QueryWrapper<SysDict> wrapper = new QueryWrapper<>();
-        if (StringUtils.isBlank(sysCode))
+        if (StringUtils.isBlank(sysCode)) {
             wrapper.isNull("sys_code");
-        else
+        } else {
             wrapper.eq("sys_code", sysCode);
-        if (StringUtils.isBlank(code))
+        }
+        if (StringUtils.isBlank(code)) {
             wrapper.isNull("code");
-        else
+        } else {
             wrapper.eq("code", code);
+        }
         if (StringUtils.isBlank(belongTo)) {
             wrapper.isNull("belong_to");
-        } else
+        } else {
             wrapper.eq("belong_to", belongTo);
+        }
         return sysDictMapper.selectOne(wrapper);
     }
 }

@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @TableName(value = "gp_sql_info")
 @ApiModel(value = "GPSqlInfo", description = "GPSqlInfo类")
-public class GPSqlInfo {
+public class GpSqlInfo {
 
     @ApiModelProperty(value = "id", name = "id", example = "1")
     @TableId(type = IdType.AUTO)
@@ -38,5 +37,5 @@ public class GPSqlInfo {
 
     @TableField(value = "columnList", exist = false)
     @ApiModelProperty(value = "columnList", name = "字段列", example = "aa")
-    List<GPSqlInfoImport> columnList;
+    List<GpSqlInfoImportBO> columnList;
 }

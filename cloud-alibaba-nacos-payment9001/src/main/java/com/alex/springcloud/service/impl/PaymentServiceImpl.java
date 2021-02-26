@@ -17,11 +17,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${server.port}")
     private String port;
 
+    @Override
     public CommonResult<Payment> getPayment(Long id) {
         Payment payment = paymentMapper.getPaymentById(id);
-        if (payment == null)
+        if (payment == null) {
             return new CommonResult<>(423, "id为" + id + "的单据不存在");
-        else
+        } else {
             return new CommonResult<>(200, "查询成功, port" + port , payment);
+        }
     }
 }

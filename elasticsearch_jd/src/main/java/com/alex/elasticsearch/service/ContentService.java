@@ -55,17 +55,20 @@ public class ContentService {
         List<JSONObject> res = contentList.stream().map(JSONUtil::parseObj).collect(Collectors.toList());
         System.out.println(res);
         //如果索引不存在，就创建一个新的索引
-        if (!elasticsearchUtil.indexExists(indexName))
+        if (!elasticsearchUtil.indexExists(indexName)) {
             elasticsearchUtil.createIndex(indexName);
+        }
         //批量导入数据到指定的索引中
         elasticsearchUtil.bulkDocument(indexName, res);
     }
 
     public List<Content> search(String keyword, Integer pageNo, Integer pageSize) throws IOException {
-        if (pageNo == null || pageNo < 0)
+        if (pageNo == null || pageNo < 0) {
             pageNo = 0;
-        if (pageSize == null || pageSize < 0)
+        }
+        if (pageSize == null || pageSize < 0) {
             pageSize = 10;
+        }
         ElasticsearchUtil elasticsearchUtil = new ElasticsearchUtil(restHighLevelClient);
         SearchRequest searchRequest = new SearchRequest("jd_goods");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

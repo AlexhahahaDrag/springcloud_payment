@@ -1,6 +1,6 @@
 package com.alex.springcloud.service;
 
-import com.alex.springcloud.entity.GPSqlInfoImport;
+import com.alex.springcloud.entity.GpSqlInfoImportBO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * @version:     1.0
  */
 @Service
-public class GPSqlService {
+public class GpSqlService {
 
     /**
      * @param list
@@ -23,13 +23,14 @@ public class GPSqlService {
      * @author: alex
      * @return: java.lang.String
      */
-    public String setGreenplumSql(List<GPSqlInfoImport> list, String greenTableName, String greenTableNameCn, String schema) {
-        if (list == null || list.size() == 0)
+    public String setGreenplumSql(List<GpSqlInfoImportBO> list, String greenTableName, String greenTableNameCn, String schema) {
+        if (list == null || list.size() == 0) {
             return "";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(" DROP TABLE IF EXISTS \"" + schema + "\".\"" + greenTableName + "\"; ");
         sb.append(" CREATE TABLE \"" + schema + "\".\"" + greenTableName + "\" ( ");
-        for (GPSqlInfoImport sqlInfoImport : list) {
+        for (GpSqlInfoImportBO sqlInfoImport : list) {
             switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
                 case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" bigint, "); break;
                 case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" double precision, "); break;
@@ -39,7 +40,7 @@ public class GPSqlService {
         }
         sb.replace(sb.length() - 2, sb.length(), "");
         sb.append(" ); ");
-        for (GPSqlInfoImport sqlInfoImport : list) {
+        for (GpSqlInfoImportBO sqlInfoImport : list) {
             sb.append(" COMMENT ON COLUMN \"" + schema + "\".\"" + greenTableName + "\".\"" + sqlInfoImport.getColumn() + "\" IS '"
                     + (sqlInfoImport.getSource() != null ? sqlInfoImport.getSource() : (sqlInfoImport.getRemark() != null ? sqlInfoImport.getRemark() : "")) + "'; ");
         }

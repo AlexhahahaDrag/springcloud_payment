@@ -8,17 +8,17 @@ import org.apache.shiro.authc.AuthenticationToken;
  * @createTime:  2020/11/13 14:49
  * @version:     1.0
  */
-public class JWTToken implements AuthenticationToken {
+public class JwtToken implements AuthenticationToken {
 
     private String token;
 
     private String expireAt;
 
-    public JWTToken(String token) {
+    public JwtToken(String token) {
         this.token = token;
     }
 
-    public JWTToken(String token, String expireAt) {
+    public JwtToken(String token, String expireAt) {
         this.token = token;
         this.expireAt = expireAt;
     }

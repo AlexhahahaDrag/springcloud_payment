@@ -27,13 +27,17 @@ public class OdsTestSqlService {
         sb.append("VALUES( ");
         int id = 0;
         for (SqlInfoImport sqlInfoImport : list) {
+            if ("ODS标准层表字段英文名".equals(sqlInfoImport.getColumn())) {
+                break;
+            }
             id++;
-            if ("s_sdt".equals(sqlInfoImport.getColumn()) || sqlInfoImport.getColumn().contains("time")  || sqlInfoImport.getColumn().contains("date"))
+            if ("s_sdt".equals(sqlInfoImport.getColumn()) || sqlInfoImport.getColumn().contains("time")  || sqlInfoImport.getColumn().contains("date")) {
                 sb.append("'" + DateTimeFormatter.ofPattern(time).format(now));
-            else if ("string".equals(sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : null))
+            } else if ("string".equals(sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : null)) {
                 sb.append("'a" + id);
-            else
+            } else {
                 sb.append("'" + id);
+            }
             sb.append("',");
         }
         sb.replace(sb.length() - 1, sb.length(), "");

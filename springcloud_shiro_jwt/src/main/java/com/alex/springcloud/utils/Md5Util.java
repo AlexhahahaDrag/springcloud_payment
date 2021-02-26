@@ -9,9 +9,9 @@ import org.apache.shiro.util.ByteSource;
  * @createTime:  2020/11/13 14:39
  * @version:     1.0
  */
-public class MD5Util {
+public class Md5Util {
 
-    protected MD5Util() {
+    protected Md5Util() {
 
     }
 
@@ -28,6 +28,6 @@ public class MD5Util {
     }
 
     public static void main(String[] args) {
-        System.out.println(MD5Util.encrypt("alex", "123456"));
+        System.out.println(Md5Util.encrypt("alex", "123456"));
     }
 }

@@ -3,9 +3,8 @@ package com.alex.springcloud.service;
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
-import com.alex.springcloud.entity.GPSqlInfo;
-import com.alex.springcloud.entity.GPSqlInfoImport;
-import com.alex.springcloud.entity.SqlInfoImport;
+import com.alex.springcloud.entity.GpSqlInfo;
+import com.alex.springcloud.entity.GpSqlInfoImportBO;
 import com.alex.springcloud.mapper.GPSqlInfoMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,10 +22,10 @@ import java.util.List;
  * @version:     1.0
  */
 @Service
-public class GPSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GPSqlInfo> {
+public class GpSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GpSqlInfo> {
 
     @Autowired
-    private GPSqlService gpSqlService;
+    private GpSqlService gpSqlService;
 
     /**
      * @param file     文件
@@ -37,10 +36,11 @@ public class GPSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GPSqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.GPSqlInfo>
      */
-    public List<GPSqlInfo> importGPInfo(MultipartFile file, String schema, Integer index, String belongTo) throws Exception {
-        List<GPSqlInfo> sqlInfos = getTableInfo(file, schema, index, belongTo);
-        if (sqlInfos != null && sqlInfos.size() > 0)
+    public List<GpSqlInfo> importGPInfo(MultipartFile file, String schema, Integer index, String belongTo) throws Exception {
+        List<GpSqlInfo> sqlInfos = getTableInfo(file, schema, index, belongTo);
+        if (sqlInfos != null && sqlInfos.size() > 0) {
             this.saveBatch(sqlInfos);
+        }
         return sqlInfos;
     }
 
@@ -53,16 +53,17 @@ public class GPSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GPSqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.GPSqlInfo>
      */
-    private List<GPSqlInfo> getTableInfo(MultipartFile file, String schema, Integer index, String belongTo) throws Exception {
-        ExcelImportResult<GPSqlInfoImport> result;
+    private List<GpSqlInfo> getTableInfo(MultipartFile file, String schema, Integer index, String belongTo) throws Exception {
+        ExcelImportResult<GpSqlInfoImportBO> result;
         int sheets = Integer.MAX_VALUE;
-        if (index == null || index < 0)
+        if (index == null || index < 0) {
             index = 0;
+        }
         //物理删除之前创建的数据
-        QueryWrapper<GPSqlInfo> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<GpSqlInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("belong_to", belongTo);
         this.baseMapper.delete(queryWrapper);
-        List<GPSqlInfo> res = new ArrayList();
+        List<GpSqlInfo> res = new ArrayList();
         while (index < sheets) {
             ImportParams importParams = new ImportParams();
             //设置导入位置
@@ -70,30 +71,32 @@ public class GPSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GPSqlInfo> {
             importParams.setTitleRows(0);
             importParams.setStartRows(0);
             importParams.setStartSheetIndex(index);
-            result = ExcelImportUtil.importExcelMore(file.getInputStream(), GPSqlInfoImport.class, importParams);
+            result = ExcelImportUtil.importExcelMore(file.getInputStream(), GpSqlInfoImportBO.class, importParams);
             sheets =  result.getWorkbook().getNumberOfSheets();
             if (result != null && result.getList() != null && result.getList().size() > 0) {
-                List<GPSqlInfoImport> list = result.getList();
+                List<GpSqlInfoImportBO> list = result.getList();
                 int size = list.size();
                 for (int i = 0; i < size; i++) {
-                    GPSqlInfoImport gpSqlInfoImport = list.get(i);
-                    if (gpSqlInfoImport.getColumn() == null || "字段名".equals(gpSqlInfoImport.getColumn()))
+                    GpSqlInfoImportBO gpSqlInfoImportBO = list.get(i);
+                    if (gpSqlInfoImportBO.getColumn() == null || "字段名".equals(gpSqlInfoImportBO.getColumn())) {
                         continue;
-                    if (gpSqlInfoImport.getColumn().startsWith("dws_")) {
-                        GPSqlInfo gpSqlInfo = new GPSqlInfo();
+                    }
+                    if (gpSqlInfoImportBO.getColumn().startsWith("dws_")) {
+                        GpSqlInfo gpSqlInfo = new GpSqlInfo();
                         gpSqlInfo.setBelongTo(belongTo);
-                        String tableName = gpSqlInfoImport.getColumn().substring(0, (gpSqlInfoImport.getColumn().indexOf("(") != -1 ? gpSqlInfoImport.getColumn().indexOf("(")
-                                : (gpSqlInfoImport.getColumn().indexOf("（")) != -1 ? gpSqlInfoImport.getColumn().indexOf("（") : gpSqlInfoImport.getColumn().length()));
+                        String tableName = gpSqlInfoImportBO.getColumn().substring(0, (gpSqlInfoImportBO.getColumn().indexOf("(") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("(")
+                                : (gpSqlInfoImportBO.getColumn().indexOf("（")) != -1 ? gpSqlInfoImportBO.getColumn().indexOf("（") : gpSqlInfoImportBO.getColumn().length()));
                         gpSqlInfo.setTableName(tableName);
                         gpSqlInfo.setColumnList(new ArrayList<>());
                         while(i + 1 < size && list.get(i + 1).getColumn() != null && !list.get(i + 1).getColumn().startsWith("dws_")) {
-                            if (!"字段名".equals(list.get(i + 1).getColumn()))
+                            if (!"字段名".equals(list.get(i + 1).getColumn())) {
                                 gpSqlInfo.getColumnList().add(list.get(i + 1));
+                            }
                             i++;
                         }
                         gpSqlInfo.setTableSql(gpSqlService.setGreenplumSql(gpSqlInfo.getColumnList(), tableName,
-                                gpSqlInfoImport.getColumn().substring((gpSqlInfoImport.getColumn().indexOf("(") != -1 ? gpSqlInfoImport.getColumn().indexOf("(") :
-                                        (gpSqlInfoImport.getColumn().indexOf("（") != -1 ? gpSqlInfoImport.getColumn().indexOf("（") : -1))  + 1, gpSqlInfoImport.getColumn().length() - 1), schema));
+                                gpSqlInfoImportBO.getColumn().substring((gpSqlInfoImportBO.getColumn().indexOf("(") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("(") :
+                                        (gpSqlInfoImportBO.getColumn().indexOf("（") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("（") : -1))  + 1, gpSqlInfoImportBO.getColumn().length() - 1), schema));
                         res.add(gpSqlInfo);
                     }
 
