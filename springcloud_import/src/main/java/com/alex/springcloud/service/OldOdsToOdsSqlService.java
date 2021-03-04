@@ -28,7 +28,7 @@ public class OldOdsToOdsSqlService {
         int i = 0;
         int size = list.size();
         String table;
-        sb.append(" INSERT OVERWRITE TABLE " + odsPrefix + "." + odsTableName + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+        sb.append(" INSERT OVERWRITE TABLE " + odsPrefix + "." + odsTableName + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
         for (int j = 0; j < oldOdsData.length; j++) {
             while(i < size) {
                 sb.append("select ");
@@ -66,7 +66,7 @@ public class OldOdsToOdsSqlService {
                     sb.append(oldOdsPrefix + ".");
                 }
                 sb.append(oldOdsData[0] + "_" + table + (SystemConstant.FULL_CN.equals(tableSysnWay) ? "_df" : "_di"));
-                sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "'" );
+                sb.append(" WHERE ds= " + SystemConstant.YESTERDAY + " " );
                 sb.append(" union all ");
             }
             i = 0;

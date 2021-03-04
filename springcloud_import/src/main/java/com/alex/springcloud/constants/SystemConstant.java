@@ -35,9 +35,9 @@ public class SystemConstant {
 
     //分区时间变量
     //public static final String CURTIME = "${curTime}";
-    public static final String YESTERDAY = "${yesterday}";
+    public static final String YESTERDAY = "'${yesterday}'";
 
-    public static final String TWO_DAYS_AGO = "${twodaysago}";
+    public static final String TWO_DAYS_AGO = "'${twodaysago}'";
 
     //sql常量
     //增量

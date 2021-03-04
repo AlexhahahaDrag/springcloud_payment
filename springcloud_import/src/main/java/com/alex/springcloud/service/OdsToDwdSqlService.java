@@ -67,7 +67,7 @@ public class OdsToDwdSqlService {
                                          String sysCode, String odsPrefix, String[] createTimes, String[] updateTimes) {
         boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
         StringBuilder sb = new StringBuilder();
-        sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+        sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
         sb.append(" SELECT CONCAT('" + sysCode + "_',s_org_code,'_', " + firstColumn + ") as " + CommonFieldEnum.S_KEY.getCode());
         sb.append(noHeadColumns);
         if (flag) {
@@ -102,7 +102,7 @@ public class OdsToDwdSqlService {
             sb.append(odsPrefix + ".");
         }
         sb.append(odsTableName);
-        sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "';");
+        sb.append(" WHERE ds= " + SystemConstant.YESTERDAY + ";");
         return sb.toString();
     }
 
@@ -121,7 +121,7 @@ public class OdsToDwdSqlService {
         StringBuilder sb = new StringBuilder();
         if (SystemConstant.ADD_CN.equals(tableSysnWay)) {
             boolean flag = (updateTimes != null && updateTimes.length > 0) || (createTimes != null && createTimes.length > 0);
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds=" + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT ");
             sb.append(" record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
@@ -141,7 +141,7 @@ public class OdsToDwdSqlService {
                 sb.append(odsPrefix + ".");
             }
             sb.append(odsTableName);
-            sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "') record;");
+            sb.append(" WHERE ds= " + SystemConstant.YESTERDAY + ") record;");
             sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds='" + SystemConstant.YESTERDAY + "')");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
@@ -173,9 +173,9 @@ public class OdsToDwdSqlService {
             sb.append(",'1' as " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(",CONCAT('" + sysCode + "_', s_org_code) as " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM " + dwdTableNameI);
-            sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "';");
+            sb.append(" WHERE ds= " + SystemConstant.YESTERDAY + ";");
         } else if (SystemConstant.FULL_CN.equals(tableSysnWay)){
-            sb.append(" --INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" --INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds=" + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT ");
             sb.append(" record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
@@ -195,9 +195,9 @@ public class OdsToDwdSqlService {
                 sb.append(odsPrefix + ".");
             }
             sb.append(odsTableName);
-            sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "') record;");
+            sb.append(" WHERE ds=" + SystemConstant.YESTERDAY + ") record;");
             sb.append("\n");
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds='" + SystemConstant.YESTERDAY + "')");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds=" + SystemConstant.YESTERDAY + ")");
             sb.append(" SELECT ");
             sb.append(" record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
@@ -220,7 +220,7 @@ public class OdsToDwdSqlService {
                 sb.append(odsPrefix + ".");
             }
             sb.append(odsTableName);
-            sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "') record;");
+            sb.append(" WHERE ds=" + SystemConstant.YESTERDAY + ") record;");
         }
         return sb.toString();
     }
@@ -304,14 +304,14 @@ public class OdsToDwdSqlService {
             sb.append(odsPrefix + ".");
         }
         sb.append(odsTableName);
-        sb.append(" WHERE ds='" + SystemConstant.TWO_DAYS_AGO + "'");
+        sb.append(" WHERE ds=" + SystemConstant.TWO_DAYS_AGO + " ");
         sb.append("                        UNION ALL ");
         sb.append("                        SELECT * FROM ");
         if (StringUtils.isNotBlank(odsPrefix)) {
             sb.append(odsPrefix + ".");
         }
         sb.append(odsTableName);
-        sb.append(" WHERE ds='" + SystemConstant.YESTERDAY + "' ");
+        sb.append(" WHERE ds=" + SystemConstant.YESTERDAY + " ");
         sb.append("                 ) a ");
         sb.append("         GROUP BY " + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", "").substring(1));
         sb.append(" ) b ");
@@ -324,12 +324,12 @@ public class OdsToDwdSqlService {
         sb.append("                ,atc.cnt as cnt2 ");
         sb.append("                 ,CASE WHEN atc.cnt=2 AND rm=2 THEN 'his' ");
         sb.append(" WHEN atc.cnt=2 AND rm=1 THEN 'update' ");
-        sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.YESTERDAY + "' THEN 'insert' ");
-        sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.TWO_DAYS_AGO + "' THEN 'delete' ");
+        sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.YESTERDAY + " THEN 'insert' ");
+        sb.append(" WHEN atc.cnt=1 AND max_ds=" + SystemConstant.TWO_DAYS_AGO + " THEN 'delete' ");
         sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
         sb.append(" FROM at_" + odsTableName + " at LEFT JOIN ( SELECT " + CommonFieldEnum.S_KEY.getCode() + ",COUNT(1) as cnt FROM at_" + odsTableName + " GROUP BY " + CommonFieldEnum.S_KEY.getCode() + " ) atc ON at." + CommonFieldEnum.S_KEY.getCode() + "=atc." + CommonFieldEnum.S_KEY.getCode() + " ) tb_u ");
         sb.append(" WHERE " + AddFieldEnum.S_ACTION.getCode() + " <> 'his' AND " + AddFieldEnum.S_ACTION.getCode() + " IS NOT NULL) ");
-        sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+        sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
         sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
         sb.append(columns);
         sb.append("         ,record." + ZipperFieldEnum.S_START_TIME.getCode());
@@ -351,7 +351,7 @@ public class OdsToDwdSqlService {
         sb.append(" FROM    ( ");
         sb.append("         SELECT  *,row_number() over (partition by " + CommonFieldEnum.S_KEY.getCode() + " order by " + ZipperFieldEnum.S_END_TIME.getCode() + " desc) as rm ");
         sb.append("         FROM " + dwdTableNameF);
-        sb.append("        WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "'");
+        sb.append("        WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
         sb.append(" ) record LEFT ");
         sb.append(" JOIN  tb_update_" + odsTableName + "  tb_update ");
         sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() + " = tb_update." + CommonFieldEnum.S_KEY.getCode());
@@ -406,6 +406,8 @@ public class OdsToDwdSqlService {
         StringBuilder sb = new StringBuilder();
         if (SystemConstant.FULL_CN.equals(tableSysnWay)) {
             boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
+            sb.append(" DROP TABLE IF EXISTS tmp_at_"+ odsTableName + " ; ");
+            sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + " ; ");
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
             sb.append(" SELECT  * ");
             sb.append(" ,ROW_NUMBER() OVER (PARTITION BY " + firstColumn + ",s_org_code ORDER BY max_ds DESC) AS rm ");
@@ -420,13 +422,13 @@ public class OdsToDwdSqlService {
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM    " + odsPrefix + "." + odsTableName );
-            sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "'");
+            sb.append(" WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
             sb.append(" UNION ALL ");
             sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_'," + firstColumn + ") AS " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM    " + odsPrefix +  "." + odsTableName);
-            sb.append(" WHERE   ds = '" + SystemConstant.YESTERDAY + "' ");
+            sb.append(" WHERE   ds = " + SystemConstant.YESTERDAY + " ");
             sb.append(" ) a ");
             sb.append(" GROUP BY " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
@@ -440,8 +442,8 @@ public class OdsToDwdSqlService {
             sb.append(" ,atc.cnt AS cnt2 ");
             sb.append(" ,CASE    WHEN atc.cnt=2 AND rm=2 THEN 'his' ");
             sb.append(" WHEN atc.cnt=2 AND rm=1 THEN 'update' ");
-            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.YESTERDAY + "' THEN 'insert' ");
-            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.TWO_DAYS_AGO + "' THEN 'delete' ");
+            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.YESTERDAY + " THEN 'insert' ");
+            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.TWO_DAYS_AGO + " THEN 'delete' ");
             sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
             sb.append(" FROM    tmp_at_" + odsTableName + " tmp_at LEFT ");
             sb.append(" JOIN    ( ");
@@ -458,7 +460,7 @@ public class OdsToDwdSqlService {
             if (!flag) {
                 sb.append("--");
             }
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
             sb.append("  ,record." + AddFieldEnum.S_ACTION.getCode());
@@ -473,7 +475,7 @@ public class OdsToDwdSqlService {
             sb.append(" ; \n");
 
             sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF);
-            sb.append(" PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
             sb.append(" ,record." + ZipperFieldEnum.S_START_TIME.getCode());
@@ -496,7 +498,7 @@ public class OdsToDwdSqlService {
             sb.append(" SELECT  * ");
             sb.append(" ,ROW_NUMBER() OVER (PARTITION BY " + CommonFieldEnum.S_KEY.getCode() + " ORDER BY " + ZipperFieldEnum.S_END_TIME.getCode() + " DESC) AS rm ");
             sb.append(" FROM " + dwdTableNameF);
-            sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "' ");
+            sb.append(" WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
             sb.append(" ) record LEFT ");
             sb.append(" JOIN    tb_update_" + odsTableName + " tb_update ");
             sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() + " = tb_update." + CommonFieldEnum.S_KEY.getCode());
@@ -519,10 +521,11 @@ public class OdsToDwdSqlService {
             sb.append(" FROM    tb_update_" + odsTableName);
             sb.append(" WHERE " + AddFieldEnum.S_ACTION.getCode() + " = 'update' ");
             sb.append(" OR " + AddFieldEnum.S_ACTION.getCode() + " = 'insert'; ");
-            sb.append(" DROP TABLE IF EXISTS tmp_at_"+ odsTableName + " ; ");
-            sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + " ; ");
+
         } else if (SystemConstant.ADD_CN.equals(tableSysnWay)){
             boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
+            sb.append(" DROP TABLE IF EXISTS tmp_at_" + odsTableName + " ;");
+            sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + " ;");
             sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
             sb.append(" SELECT  * ");
             sb.append(" ,ROW_NUMBER() OVER (PARTITION BY " + firstColumn + ",s_org_code ORDER BY max_ds DESC) AS rm ");
@@ -536,14 +539,14 @@ public class OdsToDwdSqlService {
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM " + dwdTableNameF);
-            sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "' ");
+            sb.append(" WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
             sb.append(" AND     s_stat = '1' ");
             sb.append(" UNION ALL ");
             sb.append(" SELECT  CONCAT('" + sysCode + "_',s_org_code,'_'," + firstColumn + ") AS " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             sb.append(" ,ds ");
             sb.append(" FROM    " + odsPrefix + "." + odsTableName);
-            sb.append(" WHERE   ds = '" + SystemConstant.YESTERDAY + "' ");
+            sb.append(" WHERE   ds = " + SystemConstant.YESTERDAY + " ");
             sb.append(" ) a ");
             sb.append(" GROUP BY " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns.replace(",s_sdt", ""));
@@ -556,8 +559,8 @@ public class OdsToDwdSqlService {
             sb.append(" ,atc.cnt AS cnt2 ");
             sb.append(" ,CASE    WHEN atc.cnt=2 AND rm=2 THEN 'his' ");
             sb.append(" WHEN atc.cnt=2 AND rm=1 THEN 'update' ");
-            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.YESTERDAY + "' THEN 'insert'");
-            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.TWO_DAYS_AGO + "' THEN 'delete'");
+            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.YESTERDAY + " THEN 'insert'");
+            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.TWO_DAYS_AGO + " THEN 'delete'");
             sb.append(" END AS " + AddFieldEnum.S_ACTION.getCode());
             sb.append(" FROM    tmp_at_" + odsTableName + " tmp_at LEFT");
             sb.append(" JOIN    (");
@@ -570,7 +573,7 @@ public class OdsToDwdSqlService {
             sb.append(" ) tb_u ");
             sb.append(" WHERE   " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' ");
             sb.append(" OR      " + AddFieldEnum.S_ACTION.getCode() + " = 'update'; ");
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
             sb.append(" ,record." + AddFieldEnum.S_ACTION.getCode());
@@ -582,7 +585,7 @@ public class OdsToDwdSqlService {
             sb.append(" ,CONCAT('" + sysCode + "_',s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM    tb_update_" + odsTableName);
             sb.append(" ) record; ");
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
             sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
             sb.append(columns);
             sb.append(" ,record." + ZipperFieldEnum.S_START_TIME.getCode());
@@ -604,7 +607,7 @@ public class OdsToDwdSqlService {
             sb.append(" SELECT  * ");
             sb.append(" ,ROW_NUMBER() OVER (PARTITION BY " + CommonFieldEnum.S_KEY.getCode() + " ORDER BY " + ZipperFieldEnum.S_END_TIME.getCode() + " DESC) AS rm ");
             sb.append(" FROM  " + dwdTableNameF);
-            sb.append(" WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "' ");
+            sb.append(" WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
             sb.append(" ) record LEFT ");
             sb.append(" JOIN    tb_update_" + odsTableName +  " tb_update ");
             sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() + " = tb_update." + CommonFieldEnum.S_KEY.getCode() + " ");
@@ -625,12 +628,11 @@ public class OdsToDwdSqlService {
             sb.append(" ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" , " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM " + dwdTableNameI);
-            sb.append(" WHERE   ds = '" + SystemConstant.YESTERDAY + "';");
-            sb.append(" DROP TABLE IF EXISTS tmp_at_" + odsTableName + " ;");
-            sb.append(" DROP TABLE IF EXISTS tb_update_" + odsTableName + " ;");
+            sb.append(" WHERE   ds = " + SystemConstant.YESTERDAY + ";");
 
 
-//
+//            sb.append(" DROP TABLE tmp_at_" + odsTableName + "; ");
+//            sb.append(" DROP TABLE tb_update_" + odsTableName + "; ");
 //            sb.append(" CREATE TABLE tmp_at_" + odsTableName + " AS ");
 //            sb.append(" SELECT *,row_number() over (partition by " + firstColumn + " order by max_ds desc) as rm FROM ");
 //            sb.append("         ( ");
@@ -640,14 +642,14 @@ public class OdsToDwdSqlService {
 //            sb.append("                         ( ");
 //            sb.append("                                 SELECT " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns);
 //            sb.append("                                ,ds ");
-//            sb.append("                                 FROM " + dwdTableNameF + " WHERE ds='" + SystemConstant.TWO_DAYS_AGO + "'");
+//            sb.append("                                 FROM " + dwdTableNameF + " WHERE ds= " + SystemConstant.TWO_DAYS_AGO + " ");
 //            sb.append("                                 UNION ALL ");
 //            sb.append("                                SELECT CONCAT('" + sysCode + "_',s_org_code,'_', " + firstColumn + ") as " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns);
 //            sb.append("                                 ,ds ");
 //            sb.append(" FROM ");
 //            if (StringUtils.isNotBlank(odsPrefix))
 //                sb.append(odsPrefix + ".");
-//            sb.append(odsTableName + " WHERE ds='" + SystemConstant.YESTERDAY + "' ");
+//            sb.append(odsTableName + " WHERE ds=" + SystemConstant.YESTERDAY + " ");
 //            sb.append("                         ) a ");
 //            sb.append("                 GROUP BY " + CommonFieldEnum.S_KEY.getCode() + noHeadColumns.replace(",s_sdt", "").replace(",S_SDT", ""));
 //            sb.append("         ) b ");
@@ -658,12 +660,12 @@ public class OdsToDwdSqlService {
 //            sb.append("                 ,atc.cnt as cnt2 ");
 //            sb.append("                ,CASE WHEN atc.cnt=2 AND rm=2 THEN 'his' ");
 //            sb.append(" WHEN atc.cnt=2 AND rm=1 THEN 'update' ");
-//            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.YESTERDAY + "' THEN 'insert' ");
-//            sb.append(" WHEN atc.cnt=1 AND max_ds='" + SystemConstant.TWO_DAYS_AGO + "' THEN 'delete' ");
+//            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.YESTERDAY + " THEN 'insert' ");
+//            sb.append(" WHEN atc.cnt=1 AND max_ds= " + SystemConstant.TWO_DAYS_AGO + " THEN 'delete' ");
 //            sb.append(" END AS action ");
 //            sb.append(" FROM tmp_at_" + odsTableName + " tmp_at LEFT JOIN ( SELECT " + CommonFieldEnum.S_KEY.getCode() + ",COUNT(1) as cnt FROM tmp_at_" + odsTableName + " GROUP BY " + CommonFieldEnum.S_KEY.getCode() + " ) atc ON tmp_at." + CommonFieldEnum.S_KEY.getCode() + "=atc." + CommonFieldEnum.S_KEY.getCode() + " ) tb_u ");
 //            sb.append(" WHERE action <> 'his'; ");
-//            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION (ds='" + SystemConstant.YESTERDAY + "') ");
+//            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameI + " PARTITION (ds= " + SystemConstant.YESTERDAY + ") ");
 //            sb.append(" SELECT ");
 //            sb.append("        record." + CommonFieldEnum.S_KEY.getCode());
 //            sb.append(columns);
@@ -677,7 +679,7 @@ public class OdsToDwdSqlService {
 //            sb.append("                 ,   action as " + AddFieldEnum.S_ACTION.getCode());
 //            sb.append("                FROM tb_update_" + odsTableName + ") ");
 //            sb.append(" record; ");
-//            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds='" + SystemConstant.YESTERDAY + "') ");
+//            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF + " PARTITION(ds= " + SystemConstant.YESTERDAY + ") ");
 //            sb.append(" SELECT  record." + CommonFieldEnum.S_KEY.getCode());
 //            sb.append(columns);
 //            sb.append("        ,record." + ZipperFieldEnum.S_START_TIME.getCode());
@@ -691,7 +693,7 @@ public class OdsToDwdSqlService {
 //            sb.append(" FROM    ( ");
 //            sb.append("         SELECT  *,row_number() over (partition by " + CommonFieldEnum.S_KEY.getCode() + " order by " + ZipperFieldEnum.S_END_TIME.getCode() + " desc) as rm ");
 //            sb.append("        FROM " + dwdTableNameF);
-//            sb.append("         WHERE   ds = '" + SystemConstant.TWO_DAYS_AGO + "' ");
+//            sb.append("         WHERE   ds = " + SystemConstant.TWO_DAYS_AGO + " ");
 //            sb.append(" ) record LEFT ");
 //            sb.append(" JOIN    tb_update_" + odsTableName + " tb_update");
 //            sb.append(" ON      record." + CommonFieldEnum.S_KEY.getCode() + " = tb_update." + CommonFieldEnum.S_KEY.getCode());
@@ -718,12 +720,11 @@ public class OdsToDwdSqlService {
 //            sb.append("        ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
 //            sb.append("        ,di." + CommonFieldEnum.S_SRC.getCode());
 //            sb.append(" FROM  tb_update_" + odsTableName + "   tb_update ");
-//            sb.append(" LEFT JOIN (SELECT * FROM " + dwdTableNameI +" WHERE ds='" + SystemConstant.YESTERDAY + "') di ");
+//            sb.append(" LEFT JOIN (SELECT * FROM " + dwdTableNameI +" WHERE ds= " + SystemConstant.YESTERDAY + ") di ");
 //            sb.append(" ON tb_update." + CommonFieldEnum.S_KEY.getCode() + "=di." + CommonFieldEnum.S_KEY.getCode());
 //            sb.append(" WHERE   tb_update.action = 'update' ");
 //            sb.append(" OR      tb_update.action = 'insert'; ");
-//            sb.append(" DROP TABLE tmp_at_" + odsTableName + "; ");
-//            sb.append(" DROP TABLE tb_update_" + odsTableName + "; ");
+
         }
         return sb.toString();
     }
