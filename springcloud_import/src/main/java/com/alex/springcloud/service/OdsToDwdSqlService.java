@@ -142,7 +142,7 @@ public class OdsToDwdSqlService {
             }
             sb.append(odsTableName);
             sb.append(" WHERE ds= " + SystemConstant.YESTERDAY + ") record;");
-            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds='" + SystemConstant.YESTERDAY + "')");
+            sb.append(" INSERT OVERWRITE TABLE " + dwdTableNameF +" PARTITION(ds= " + SystemConstant.YESTERDAY + " )");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
             if (flag) {
