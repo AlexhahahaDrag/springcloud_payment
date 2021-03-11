@@ -127,13 +127,11 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                     for(int i = 2; i < s.length; i++) {
                         suffixName.append("_" + s[i]);
                     }
-                    if (SystemConstant.FACT_TABLE.equals(tableType) && SystemConstant.ADD_CN.equals(tableSysnWay)) {
-                        if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime())) {
-                            createTimes = gatherImportInfo.getCreateTime().split("\\/");
-                        }
-                        if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime())) {
-                            updateTimes = gatherImportInfo.getUpdateTime().split("\\/");
-                        }
+                    if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime())) {
+                        createTimes = gatherImportInfo.getCreateTime().split("\\/");
+                    }
+                    if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime())) {
+                        updateTimes = gatherImportInfo.getUpdateTime().split("\\/");
                     }
                 }
                 if (SystemConstant.FACT_TABLE.equals(tableType)) {

@@ -76,13 +76,13 @@ public class OdsToDwdSqlService {
         if (updateTimes != null && updateTimes.length > 0) {
             for (String updateTime : updateTimes) {
                 String newUpdateTime = dealTime(updateTime);
-                sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
+                sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyymmddhhmiss') ,'yyyymmddhhmiss') ");
             }
         }
         if (createTimes != null && createTimes.length > 0) {
             for (String createTime : createTimes) {
                 String newCreateTime = dealTime(createTime);
-                sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
+                sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyymmddhhmiss') ,'yyyymmddhhmiss') ");
             }
         }
         if (flag) {
@@ -151,13 +151,13 @@ public class OdsToDwdSqlService {
             if (updateTimes != null && updateTimes.length > 0) {
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
-                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss') ");
+                    sb.append(" WHEN " + newUpdateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newUpdateTime + ",'yyyymmddhhmiss') ,'yyyymmddhhmiss') ");
                 }
             }
             if (createTimes != null && createTimes.length > 0) {
                 for (String createTime : createTimes) {
                     String newCreateTime = dealTime(createTime);
-                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyy-mm-dd hh:mi:ss'),'yyyymmddhhmiss') ");
+                    sb.append(" WHEN " + newCreateTime + " IS NOT NULL THEN TO_CHAR(TO_DATE( " + newCreateTime + ",'yyyymmddhhmiss  '),'yyyymmddhhmiss') ");
                 }
             }
             if (flag) {
@@ -334,13 +334,13 @@ public class OdsToDwdSqlService {
         sb.append(columns);
         sb.append("         ,record." + ZipperFieldEnum.S_START_TIME.getCode());
         sb.append("        ,CASE ");
+        sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL AND " + AddFieldEnum.S_ACTION.getCode() + " =  'delete' THEN TO_CHAR(DATEADD(TO_DATE(max_s_sdt,'yyyymmddhhmiss'), 1, 'dd') ,'yyyymmddhhmiss') ");
         if (updateTimes != null && updateTimes.length > 0) {
             for (String updateTime : updateTimes) {
                 String newUpdateTime = dealTime(updateTime);
                 sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
             }
         }
-        sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL AND " + AddFieldEnum.S_ACTION.getCode() + " =  'delete' THEN TO_CHAR(DATEADD(TO_DATE(max_s_sdt,'yyyymmddhhmiss'), 1, 'dd') ,'yyyymmddhhmiss') ");
         sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL THEN tb_update.max_s_sdt ");
         sb.append(" ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
         sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
@@ -358,28 +358,31 @@ public class OdsToDwdSqlService {
         sb.append("  UNION ");
         sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
         sb.append(noHeadColumns.replace(",s_sdt", ",max_s_sdt as s_sdt").replace(",S_SDT", ",max_s_sdt as s_sdt"));
-        sb.append(",CASE ");
-        if (createTimes != null && createTimes.length > 0) {
-            for (String createTime : createTimes) {
-                String newCreateTime = dealTime(createTime);
-                sb.append("  WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' AND " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+        if ((createTimes == null || createTimes.length == 0) && (updateTimes == null || updateTimes.length == 0)) {
+            sb.append(",max_s_sdt as " + ZipperFieldEnum.S_START_TIME.getCode());
+        } else {
+            sb.append(",CASE ");
+            if (createTimes != null && createTimes.length > 0) {
+                for (String createTime : createTimes) {
+                    String newCreateTime = dealTime(createTime);
+                    sb.append("  WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' AND " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
+                }
             }
-        }
-        if (updateTimes != null && updateTimes.length > 0) {
-            for (String updateTime : updateTimes) {
-                String newUpdateTime = dealTime(updateTime);
-                sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+            if (updateTimes != null && updateTimes.length > 0) {
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                }
             }
-        }
-        sb.append("  WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' THEN '19710101000000' ");
-        if (updateTimes != null && updateTimes.length > 0) {
-            for (String updateTime : updateTimes) {
-                String newUpdateTime = dealTime(updateTime);
-                sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'update' and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+            if (updateTimes != null && updateTimes.length > 0) {
+                for (String updateTime : updateTimes) {
+                    String newUpdateTime = dealTime(updateTime);
+                    sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'update' and " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
+                }
             }
+            sb.append("  ELSE max_s_sdt ");
+            sb.append(" END as " + ZipperFieldEnum.S_START_TIME.getCode());
         }
-        sb.append("  ELSE max_s_sdt ");
-        sb.append(" END as " + ZipperFieldEnum.S_START_TIME.getCode());
         sb.append("         ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
         sb.append("        ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
         sb.append(" ,CONCAT('" + sysCode + "_',s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
@@ -480,13 +483,13 @@ public class OdsToDwdSqlService {
             sb.append(columns);
             sb.append(" ,record." + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append(" ,CASE ");
+            sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL AND " + AddFieldEnum.S_ACTION.getCode() + " =  'delete' THEN TO_CHAR(DATEADD(TO_DATE(max_s_sdt,'yyyymmddhhmiss'), 1, 'dd') ,'yyyymmddhhmiss') ");
             if (flag && updateTimes != null && updateTimes.length > 0) {
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
                     sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND " + newUpdateTime + " IS NOT NULL THEN " + newUpdateTime);
                 }
             }
-            sb.append(" WHEN record.rm=1 and tb_update." + firstColumn + " IS NOT NULL AND " + AddFieldEnum.S_ACTION.getCode() + " =  'delete' THEN TO_CHAR(DATEADD(TO_DATE(max_s_sdt,'yyyymmddhhmiss'), 1, 'dd') ,'yyyymmddhhmiss') ");
             sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL THEN tb_update.max_s_sdt ");
             sb.append(" ELSE record." + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" END AS " + ZipperFieldEnum.S_END_TIME.getCode());
@@ -505,23 +508,24 @@ public class OdsToDwdSqlService {
             sb.append(" UNION ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns.replace(",s_sdt", ", max_s_sdt AS s_sdt ").replace(",S_SDT", ",max_s_sdt AS s_sdt "));
-            sb.append(" ,CASE ");
             if (flag && createTimes != null && createTimes.length > 0) {
+                sb.append(" ,CASE ");
                 for (String createTime : createTimes) {
                     String newCreateTime = dealTime(createTime);
                     sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' AND " + newCreateTime + " IS NOT NULL THEN " + newCreateTime);
                 }
+                sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' THEN '19710101000000' ");
+                sb.append(" ELSE max_s_sdt ");
+                sb.append(" END AS " + ZipperFieldEnum.S_START_TIME.getCode());
+            } else {
+                sb.append(" ,max_s_sdt AS " + ZipperFieldEnum.S_START_TIME.getCode());
             }
-            sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' THEN '19710101000000' ");
-            sb.append(" ELSE max_s_sdt ");
-            sb.append(" END AS " + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" ,CONCAT('" + sysCode + "_',s_org_code) AS " + CommonFieldEnum.S_SRC.getCode());
             sb.append(" FROM    tb_update_" + odsTableName);
             sb.append(" WHERE " + AddFieldEnum.S_ACTION.getCode() + " = 'update' ");
             sb.append(" OR " + AddFieldEnum.S_ACTION.getCode() + " = 'insert'; ");
-
         } else if (SystemConstant.ADD_CN.equals(tableSysnWay)){
             boolean flag = (createTimes != null && createTimes.length > 0) || (updateTimes != null && updateTimes.length > 0);
             sb.append(" DROP TABLE IF EXISTS tmp_at_" + odsTableName + " ;");
@@ -593,7 +597,7 @@ public class OdsToDwdSqlService {
             if (flag && updateTimes != null && updateTimes.length > 0) {
                 for (String updateTime : updateTimes) {
                     String newUpdateTime = dealTime(updateTime);
-                    sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND record." + newUpdateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE(record." + newUpdateTime + ",'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss' ) ");
+                    sb.append(" WHEN record.rm=1 AND tb_update." + firstColumn + " IS NOT NULL AND record." + newUpdateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE(record." + newUpdateTime + ",'yyyymmddhhmiss') ,'yyyymmddhhmiss' ) ");
                 }
             }
             sb.append(" WHEN record.rm=1 AND tb_update.id IS NOT NULL THEN tb_update.max_s_sdt ");
@@ -614,16 +618,17 @@ public class OdsToDwdSqlService {
             sb.append(" UNION ");
             sb.append(" SELECT " + CommonFieldEnum.S_KEY.getCode());
             sb.append(noHeadColumns);
-            sb.append(" ,CASE ");
             if (flag && createTimes != null && createTimes.length > 0) {
+                sb.append(" ,CASE ");
                 for (String createTime : createTimes) {
                     String newCreateTime = dealTime(createTime);
-                    sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' AND " + newCreateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE( " + newCreateTime + " ,'yyyy-mm-dd hh:mi:ss') ,'yyyymmddhhmiss' ) ");
+                    sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' AND " + newCreateTime + " IS NOT NULL THEN TO_CHAR( TO_DATE( " + newCreateTime + " ,'yyyymmddhhmiss') ,'yyyymmddhhmiss' ) ");
                 }
+                sb.append(" ELSE s_sdt ");
+                sb.append(" END AS " + ZipperFieldEnum.S_START_TIME.getCode());
+            } else {
+                sb.append(" ,s_sdt AS " + ZipperFieldEnum.S_START_TIME.getCode());
             }
-            sb.append(" WHEN " + AddFieldEnum.S_ACTION.getCode() + " = 'insert' THEN '19710101000000' ");
-            sb.append(" ELSE s_sdt ");
-            sb.append(" END AS " + ZipperFieldEnum.S_START_TIME.getCode());
             sb.append(" ,'20990101000000' AS " + ZipperFieldEnum.S_END_TIME.getCode());
             sb.append(" ,'1' AS " + ZipperFieldEnum.S_STAT.getCode());
             sb.append(" , " + CommonFieldEnum.S_SRC.getCode());

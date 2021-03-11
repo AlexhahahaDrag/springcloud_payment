@@ -57,15 +57,15 @@ public class SqlInfoController {
         return gpSqlInfoService.importGPInfo(file, schema, startSheet, belongTo);
     }
 
-    @ApiOperation(value = "生成字典数据", httpMethod = "POST", notes = "生成字典数据", produces = "application/json; charset=utf-8")
-    @PostMapping("/dictSql")
-    public List<DictInfoBo> getDictInfo(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
-                                        @ApiParam(value = "字典表名", defaultValue = "0", example = "0") @RequestParam(name="dictTable", required = false, defaultValue = "0") String dictTable,
-                                        @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
-                                        @ApiParam(value = "结束的sheet页", defaultValue = "0", example = "0") @RequestParam(name="endSheet", required = false, defaultValue = "0") Integer endSheet,
-                                        @ApiParam(value = "开始id", defaultValue = "0", example = "0") @RequestParam(name="id", required = false, defaultValue = "0") Integer id,
-                                        @ApiParam(value = "dwd项目号", defaultValue = "0", example = "0") @RequestParam(name="sysCode", required = false, defaultValue = "0") String sysCode,
-                                        @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
-        return dictService.dictInfo(file, startSheet, endSheet, sysCode, belongTo, dictTable, id);
-    }
+//    @ApiOperation(value = "生成字典数据", httpMethod = "POST", notes = "生成字典数据", produces = "application/json; charset=utf-8")
+//    @PostMapping("/dictSql")
+//    public List<DictInfoBo> getDictInfo(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
+//                                        @ApiParam(value = "字典表名", defaultValue = "0", example = "0") @RequestParam(name="dictTable", required = false, defaultValue = "0") String dictTable,
+//                                        @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
+//                                        @ApiParam(value = "结束的sheet页", defaultValue = "0", example = "0") @RequestParam(name="endSheet", required = false, defaultValue = "0") Integer endSheet,
+//                                        @ApiParam(value = "开始id", defaultValue = "0", example = "0") @RequestParam(name="id", required = false, defaultValue = "0") Integer id,
+//                                        @ApiParam(value = "dwd项目号", defaultValue = "0", example = "0") @RequestParam(name="sysCode", required = false, defaultValue = "0") String sysCode,
+//                                        @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
+//        return dictService.dictInfo(file, startSheet, endSheet, sysCode, belongTo, dictTable, id);
+//    }
 }
