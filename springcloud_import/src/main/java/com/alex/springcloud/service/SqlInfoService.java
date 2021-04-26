@@ -40,8 +40,9 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.SqlInfo>
      */
-    public List<SqlInfo> importInfo(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
-        List<SqlInfo> sqlInfos = importSql(file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase);
+    public List<SqlInfo> importInfo(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo,
+                                    String oldOdsPrefix, String oldOdsDatabase, String dwdPrefix) throws Exception {
+        List<SqlInfo> sqlInfos = importSql(file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase, dwdPrefix);
         if (sqlInfos != null && sqlInfos.size() > 0) {
             this.saveBatch(sqlInfos);
         }
@@ -57,7 +58,8 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
      * @author: alex
      * @return: java.util.List<com.alex.springcloud.entity.SqlInfo>
      */
-    private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
+    private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo,
+                                    String oldOdsPrefix, String oldOdsDatabase, String dwdPrefix) throws Exception {
         List<GatherImportInfo> firstSheet = getFirstSheet(file);
         if(file==null) {
             throw new Exception("文件不能为空！");
@@ -67,10 +69,11 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
             throw new Exception("首页不能为空！");
         }
         ;
-        return getTableInfo(firstSheet, file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase);
+        return getTableInfo(firstSheet, file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase, dwdPrefix);
     }
 
-    private List<SqlInfo> getTableInfo(List<GatherImportInfo> firstSheet, MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase) throws Exception {
+    private List<SqlInfo> getTableInfo(List<GatherImportInfo> firstSheet, MultipartFile file, Integer index, String dwdSysCode,
+                                       String odsPrefix, String belongTo, String oldOdsPrefix, String oldOdsDatabase, String dwdPrefix) throws Exception {
         List<SqlInfo> list = new ArrayList<>();
         ExcelImportResult<SqlInfoImport> result;
         int sheets = Integer.MAX_VALUE;
@@ -171,14 +174,14 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
                 if (SystemConstant.FACT_TABLE.equals(tableType)) {
                     sqlInfo.setDwdSqlAdd(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
                     sqlInfo.setDwdSqlAddMysql(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
                 } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)){
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
                 } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)) {
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay));
+                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
                 }
                 sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
                 sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
