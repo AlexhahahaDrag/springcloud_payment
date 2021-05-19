@@ -38,4 +38,12 @@ public class GpSqlInfo {
     @TableField(value = "columnList", exist = false)
     @ApiModelProperty(value = "columnList", name = "字段列", example = "aa")
     List<GpSqlInfoImportBO> columnList;
+
+    @ApiModelProperty(value = "tableSqlMc", name = "mc建表语句", example = "mc")
+    @TableField(value = "table_sql_mc")
+    private String tableSqlMc;
+
+    @ApiModelProperty(value = "sort", name = "分类", example = "sort")
+    @TableField(value = "sort")
+    private String sort;
 }

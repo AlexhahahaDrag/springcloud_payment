@@ -65,6 +65,7 @@ public class GpSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GpSqlInfo> {
         this.baseMapper.delete(queryWrapper);
         List<GpSqlInfo> res = new ArrayList();
         while (index < sheets) {
+            System.out.println("index:" + index);
             ImportParams importParams = new ImportParams();
             //设置导入位置
             importParams.setHeadRows(1);
@@ -73,6 +74,8 @@ public class GpSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GpSqlInfo> {
             importParams.setStartSheetIndex(index);
             result = ExcelImportUtil.importExcelMore(file.getInputStream(), GpSqlInfoImportBO.class, importParams);
             sheets =  result.getWorkbook().getNumberOfSheets();
+            String sheetName = result.getWorkbook().getSheetName(index);
+            System.out.println("sheetName:" + sheetName);
             if (result != null && result.getList() != null && result.getList().size() > 0) {
                 List<GpSqlInfoImportBO> list = result.getList();
                 int size = list.size();
@@ -97,6 +100,10 @@ public class GpSqlInfoService extends ServiceImpl<GPSqlInfoMapper, GpSqlInfo> {
                         gpSqlInfo.setTableSql(gpSqlService.setGreenplumSql(gpSqlInfo.getColumnList(), tableName,
                                 gpSqlInfoImportBO.getColumn().substring((gpSqlInfoImportBO.getColumn().indexOf("(") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("(") :
                                         (gpSqlInfoImportBO.getColumn().indexOf("（") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("（") : -1))  + 1, gpSqlInfoImportBO.getColumn().length() - 1), schema));
+                        gpSqlInfo.setTableSqlMc(gpSqlService.setMaxComputeSql(gpSqlInfo.getColumnList(), tableName,
+                                gpSqlInfoImportBO.getColumn().substring((gpSqlInfoImportBO.getColumn().indexOf("(") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("(") :
+                                        (gpSqlInfoImportBO.getColumn().indexOf("（") != -1 ? gpSqlInfoImportBO.getColumn().indexOf("（") : -1))  + 1, gpSqlInfoImportBO.getColumn().length() - 1)));
+                        gpSqlInfo.setSort(sheetName);
                         res.add(gpSqlInfo);
                     }
 
