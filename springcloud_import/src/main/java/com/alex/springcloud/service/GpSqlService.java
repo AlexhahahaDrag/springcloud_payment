@@ -31,10 +31,10 @@ public class GpSqlService {
         sb.append(" DROP TABLE IF EXISTS \"" + schema + "\".\"" + greenTableName + "\"; ");
         sb.append(" CREATE TABLE \"" + schema + "\".\"" + greenTableName + "\" ( ");
         for (GpSqlInfoImportBO sqlInfoImport : list) {
-            switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
-                case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" bigint, "); break;
-                case "double" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" double precision, "); break;
-                case "timestamp" :  sb.append(" \"" + sqlInfoImport.getColumn() + "\" timestamp, "); break;
+            switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase().trim() : "") {
+                case "bigint" :  sb.append(" \"" + sqlInfoImport.getColumn().trim() + "\" bigint, "); break;
+                case "double" :  sb.append(" \"" + sqlInfoImport.getColumn().trim() + "\" double precision, "); break;
+                case "timestamp" :  sb.append(" \"" + sqlInfoImport.getColumn().trim() + "\" timestamp, "); break;
                 default: sb.append(" \"" + sqlInfoImport.getColumn() + "\" varchar, ");
             }
         }
@@ -64,10 +64,10 @@ public class GpSqlService {
         sb.append(" CREATE TABLE IF NOT EXISTS " + greenTableName + " ");
         sb.append(" ( ");
         for (GpSqlInfoImportBO sqlInfoImport : list) {
-            switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase() : "") {
-                case "bigint" :  sb.append(" `" + sqlInfoImport.getColumn() + "` BIGINT " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", "); break;
-                case "double" :  sb.append(" `" + sqlInfoImport.getColumn() + "` DOUBLE " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", "); break;
-                default: sb.append(" `" + sqlInfoImport.getColumn() + "` STRING " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", ");
+            switch (sqlInfoImport.getColumnType() != null ? sqlInfoImport.getColumnType().toLowerCase().trim() : "") {
+                case "bigint" :  sb.append(" `" + sqlInfoImport.getColumn().trim() + "` BIGINT " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", "); break;
+                case "double" :  sb.append(" `" + sqlInfoImport.getColumn().trim() + "` DOUBLE " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", "); break;
+                default: sb.append(" `" + sqlInfoImport.getColumn().trim() + "` STRING " + (sqlInfoImport.getSource() != null ? " COMMENT '" + sqlInfoImport.getSource() + "'" : (sqlInfoImport.getRemark() != null ? " COMMENT '" + sqlInfoImport.getRemark() + "'" : "")) + ", ");
             }
         }
         sb.replace(sb.length() - 2, sb.length(), "");
