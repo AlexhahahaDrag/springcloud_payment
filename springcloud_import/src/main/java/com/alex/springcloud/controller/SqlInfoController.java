@@ -34,7 +34,7 @@ public class SqlInfoController {
     @Autowired
     private DictService dictService;
 
-    @ApiOperation(value = "客户信息批量导入", httpMethod = "POST", notes = "客户信息批量导入", produces = "application/json; charset=utf-8")
+    @ApiOperation(value = "批量处理ods标准表", httpMethod = "POST", notes = "批量处理ods标准表", produces = "application/json; charset=utf-8")
     @PostMapping("/import")
     public List<SqlInfo> importItemDetail(@ApiParam(value = "ods标准表文件", required = true) @RequestBody MultipartFile file,
                                           @ApiParam(value = "dwd系统编号", defaultValue = "", example = "302") @RequestParam(name="dwdSysCode", required = false, defaultValue = "") String dwdSysCode,
