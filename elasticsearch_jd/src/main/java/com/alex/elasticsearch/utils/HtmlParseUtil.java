@@ -15,9 +15,9 @@ import java.util.List;
 public class HtmlParseUtil {
 
     public static List<Content> parseJD(String keyword) throws IOException {
-        String url = "https://search.jd.com/Search?keyword=" + keyword;
+        String url = "http://erptestm.rloraerp.com:8006/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE";
         Document document = Jsoup.parse(new URL(new String(url.getBytes(), "utf-8")), 3000);
-        Element j_goodsList = document.getElementById("J_goodsList");
+        Element j_goodsList = document.getElementById("AppsNavLink");
         Elements lis = j_goodsList.getElementsByTag("li");
         List<Content> list = new ArrayList<>();
         for (Element element : lis) {

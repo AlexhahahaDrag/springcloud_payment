@@ -49,6 +49,8 @@
         <module>aliyun_maxcompute</module>
         <module>springcloud_import</module>
         <module>syns_mc_to_gp</module>
+        <module>siddhi_test</module>
+        <module>xxl_job</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
