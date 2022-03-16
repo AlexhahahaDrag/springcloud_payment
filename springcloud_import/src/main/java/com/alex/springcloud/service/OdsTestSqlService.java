@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class OdsTestSqlService {
 
-    public String setOdsTestSql(List<SqlInfoImport> list, String odsTableName) {
+    public String setOdsTestSql(List<SqlInfoImport> list, String odsTableName) throws Exception {
         StringBuilder sb = new StringBuilder();
         LocalDateTime now = LocalDateTime.now();
         String time = "yyyyMMddhhmmss";

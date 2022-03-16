@@ -42,7 +42,7 @@ public class SqlInfoController {
                                           @ApiParam(value = "dwd项目空间名称", defaultValue = "", example = "PRJ_302_DW_prod") @RequestParam(name="dwdPrefix", required = false, defaultValue = "") String dwdPrefix,
 //                                          @ApiParam(value = "ods原始前缀", defaultValue = "", example = "PRJ_1020005_ods_prod") @RequestParam(name="oldOdsPrefix", required = false, defaultValue = "") String oldOdsPrefix,
 //                                          @ApiParam(value = "ods原始数据库", defaultValue = "", example = "ods_raw_1030001_100") @RequestParam(name="oldOdsDatabase", required = false, defaultValue = "") String oldOdsDatabase,
-                                          @ApiParam(value = "开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
+                                          @ApiParam(value = "第一张表开始的sheet页", defaultValue = "0", example = "0") @RequestParam(name="startSheet", required = false, defaultValue = "0") Integer startSheet,
                                           @ApiParam(value = "属于", defaultValue = "0", example = "lihua") @RequestParam(name="belongTo", required = false, defaultValue = "") String belongTo) throws Exception {
         String oldOdsPrefix = null;
         String oldOdsDatabase = null;

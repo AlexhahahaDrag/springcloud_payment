@@ -29,9 +29,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Spring boot swagger learn")
-                .description("ha ha ha ! be happy")
-                .termsOfServiceUrl("www.baidu.com")
+                .title("sql生成工具")
+                .description("生成ods标准表、dwd表、ods标准到dwd同步sql、ods标准到dwd初始化sql")
                 .version("1.0.0-SNAPSHOT")
                 .build();
     }

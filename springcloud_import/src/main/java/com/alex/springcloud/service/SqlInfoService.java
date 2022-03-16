@@ -61,14 +61,13 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
     private List<SqlInfo> importSql(MultipartFile file, Integer index, String dwdSysCode, String odsPrefix, String belongTo,
                                     String oldOdsPrefix, String oldOdsDatabase, String dwdPrefix) throws Exception {
         List<GatherImportInfo> firstSheet = getFirstSheet(file);
-        if(file==null) {
+        if(file == null) {
             throw new Exception("文件不能为空！");
         }
         //首页不能为空
         if (firstSheet == null || firstSheet.isEmpty()) {
             throw new Exception("首页不能为空！");
         }
-        ;
         return getTableInfo(firstSheet, file, index, dwdSysCode, odsPrefix, belongTo, oldOdsPrefix, oldOdsDatabase, dwdPrefix);
     }
 
@@ -86,113 +85,117 @@ public class SqlInfoService extends ServiceImpl<SqlInfoMapper, SqlInfo> {
         queryWrapper.eq("belong_to", belongTo);
         this.baseMapper.delete(queryWrapper);
         int start = -1;
-        while (index < sheets) {
-            ImportParams importParams = new ImportParams();
-            //设置导入位置
-            importParams.setHeadRows(1);
-            importParams.setTitleRows(0);
-            importParams.setStartRows(0);
-            importParams.setStartSheetIndex(index);
-            result = ExcelImportUtil.importExcelMore(file.getInputStream(), SqlInfoImport.class, importParams);
-            sheets =  result.getWorkbook().getNumberOfSheets();
-            if (result != null && result.getList() != null && result.getList().size() > 0) {
-                SqlInfo sqlInfo = new SqlInfo();
-                String odsTableName = "";
-                String odsTableNameCn = "";
-                //dwd表增量名
-                String dwdTableNameI = "";
-                String dwdTableNameCnI = "";
-                //dwd表全量名
-                String dwdTableNameF = "";
-                String dwdTableNameCnF = "";
-                //greenplum表名
-                String greenTableName = "";
-                String greenTableNameCn = "";
-                //表类型
-                String tableType = "";
-                //表同步方式
-                String tableSysnWay = "";
-                //dwd表前缀名
-                StringBuilder suffixName = new StringBuilder();
-                //创建时间
-                String[] createTimes = null;
-                //更新时间
-                String[] updateTimes = null;
-                //根据表名的最后一位判断表是事实表还是维度表,如果是事实表生成事实表全量名
-                GatherImportInfo gatherImportInfo = firstSheet.get(++start);
-                if (gatherImportInfo != null) {
-                    tableType = gatherImportInfo.getTableType();
-                    tableSysnWay = gatherImportInfo.getSysnWay();
-                    odsTableName = gatherImportInfo.getTableName();
-                    odsTableNameCn = gatherImportInfo.getTableNameCn();
-                    suffixName.append("_" + dwdSysCode + (gatherImportInfo.getDwdTableNo() == null ? "" : gatherImportInfo.getDwdTableNo()));
-                    String[] s = odsTableName.split("_");
-                    for(int i = 2; i < s.length; i++) {
-                        suffixName.append("_" + s[i]);
+        try {
+            while (index < sheets) {
+                ImportParams importParams = new ImportParams();
+                //设置导入位置
+                importParams.setHeadRows(1);
+                importParams.setTitleRows(0);
+                importParams.setStartRows(0);
+                importParams.setStartSheetIndex(index);
+                result = ExcelImportUtil.importExcelMore(file.getInputStream(), SqlInfoImport.class, importParams);
+                sheets = result.getWorkbook().getNumberOfSheets();
+                if (result != null && result.getList() != null && result.getList().size() > 0) {
+                    SqlInfo sqlInfo = new SqlInfo();
+                    String odsTableName = "";
+                    String odsTableNameCn = "";
+                    //dwd表增量名
+                    String dwdTableNameI = "";
+                    String dwdTableNameCnI = "";
+                    //dwd表全量名
+                    String dwdTableNameF = "";
+                    String dwdTableNameCnF = "";
+                    //greenplum表名
+                    String greenTableName = "";
+                    String greenTableNameCn = "";
+                    //表类型
+                    String tableType = "";
+                    //表同步方式
+                    String tableSysnWay = "";
+                    //dwd表前缀名
+                    StringBuilder suffixName = new StringBuilder();
+                    //创建时间
+                    String[] createTimes = null;
+                    //更新时间
+                    String[] updateTimes = null;
+                    //根据表名的最后一位判断表是事实表还是维度表,如果是事实表生成事实表全量名
+                    GatherImportInfo gatherImportInfo = firstSheet.get(++start);
+                    if (gatherImportInfo != null) {
+                        tableType = gatherImportInfo.getTableType();
+                        tableSysnWay = gatherImportInfo.getSysnWay();
+                        odsTableName = gatherImportInfo.getTableName();
+                        odsTableNameCn = gatherImportInfo.getTableNameCn();
+                        suffixName.append("_" + dwdSysCode + (gatherImportInfo.getDwdTableNo() == null ? "" : gatherImportInfo.getDwdTableNo()));
+                        String[] s = odsTableName.split("_");
+                        for (int i = 2; i < s.length; i++) {
+                            suffixName.append("_" + s[i]);
+                        }
+                        if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime())) {
+                            createTimes = gatherImportInfo.getCreateTime().split("\\/");
+                        }
+                        if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime())) {
+                            updateTimes = gatherImportInfo.getUpdateTime().split("\\/");
+                        }
                     }
-                    if (StringUtils.isNotBlank(gatherImportInfo.getCreateTime())) {
-                        createTimes = gatherImportInfo.getCreateTime().split("\\/");
+                    if (SystemConstant.FACT_TABLE.equals(tableType)) {
+                        if (odsTableName.charAt(odsTableName.length() - 1) == 'i') {
+                            dwdTableNameI = SystemConstant.DWD + suffixName.toString();
+                            dwdTableNameCnI = SystemConstant.DWD_UP + odsTableNameCn.substring(3);
+                            int last = dwdTableNameI.lastIndexOf("_");
+                            String tail = dwdTableNameI.substring(last);
+                            dwdTableNameF = dwdTableNameI.substring(0, last) + tail.replace(SystemConstant.ADD_TABLE, SystemConstant.FULL_TABLE);
+                            dwdTableNameCnF = dwdTableNameCnI.substring(0, dwdTableNameCnI.length() - 2) + SystemConstant.FULL_CN;
+                        } else if (odsTableName.charAt(odsTableName.length() - 1) == 'f') {
+                            dwdTableNameF = SystemConstant.DWD + suffixName.toString();
+                            dwdTableNameCnF = SystemConstant.DWD_UP + odsTableNameCn.substring(3);
+                            int last = dwdTableNameF.lastIndexOf("_");
+                            String tail = dwdTableNameF.substring(last);
+                            dwdTableNameI = dwdTableNameF.substring(0, last) + tail.replace(SystemConstant.FULL_TABLE, SystemConstant.ADD_TABLE);
+                            dwdTableNameCnI = dwdTableNameCnF.substring(0, dwdTableNameCnF.length() - 2) + SystemConstant.ADD_CN;
+                        }
+                    } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)) {
+                        dwdTableNameF = SystemConstant.DIM + suffixName.toString();
+                        dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
+                    } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)) {
+                        dwdTableNameF = SystemConstant.DIM + suffixName.toString();
+                        dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
                     }
-                    if (StringUtils.isNotBlank(gatherImportInfo.getUpdateTime())) {
-                        updateTimes = gatherImportInfo.getUpdateTime().split("\\/");
+                    greenTableName = StringUtils.isEmpty(gatherImportInfo.getGreenTableName()) ? dwdTableNameF : gatherImportInfo.getGreenTableName();
+                    greenTableNameCn = StringUtils.isEmpty(gatherImportInfo.getGreenTableNameCn()) ? dwdTableNameCnF : gatherImportInfo.getGreenTableNameCn();
+                    sqlInfo.setDwdZipperTableName(dwdTableNameF);
+                    sqlInfo.setDwdAddTableName(dwdTableNameI);
+                    sqlInfo.setTableName(odsTableName);
+                    sqlInfo.setTableNameCn(odsTableNameCn);
+                    sqlInfo.setSysCode(dwdSysCode);
+                    sqlInfo.setBelongTo(belongTo);
+                    sqlInfo.setSqlZipperGreenplumName(greenTableName);
+                    sqlInfo.setOdsSql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.ODS));
+                    sqlInfo.setOdsSqlMysql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.ODS));
+                    if (SystemConstant.FACT_TABLE.equals(tableType)) {
+                        sqlInfo.setDwdSqlAdd(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
+                        sqlInfo.setDwdSqlAddMysql(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
+                        sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                        sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                    } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)) {
+                        sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                        sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                    } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)) {
+                        sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
+                        sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
                     }
-                }
-                if (SystemConstant.FACT_TABLE.equals(tableType)) {
-                    if (odsTableName.charAt(odsTableName.length() - 1) == 'i') {
-                        dwdTableNameI = SystemConstant.DWD + suffixName.toString();
-                        dwdTableNameCnI = SystemConstant.DWD_UP + odsTableNameCn.substring(3);
-                        int last = dwdTableNameI.lastIndexOf("_");
-                        String tail = dwdTableNameI.substring(last);
-                        dwdTableNameF = dwdTableNameI.substring(0, last) + tail.replace(SystemConstant.ADD_TABLE, SystemConstant.FULL_TABLE);
-                        dwdTableNameCnF = dwdTableNameCnI.substring(0, dwdTableNameCnI.length() - 2) + SystemConstant.FULL_CN;
-                    } else if (odsTableName.charAt(odsTableName.length() - 1) == 'f') {
-                        dwdTableNameF = SystemConstant.DWD + suffixName.toString();
-                        dwdTableNameCnF = SystemConstant.DWD_UP + odsTableNameCn.substring(3);
-                        int last = dwdTableNameF.lastIndexOf("_");
-                        String tail = dwdTableNameF.substring(last);
-                        dwdTableNameI = dwdTableNameF.substring(0, last) + tail.replace(SystemConstant.FULL_TABLE, SystemConstant.ADD_TABLE);
-                        dwdTableNameCnI = dwdTableNameCnF.substring(0, dwdTableNameCnF.length() - 2) + SystemConstant.ADD_CN;
+                    sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
+                    sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
+                    sqlInfo.setSqlZipperGreenplum(tableSqlService.setGreenplumSql(result.getList(), greenTableName, greenTableNameCn));
+                    sqlInfo.setOdsTestSql(odsTestSqlService.setOdsTestSql(result.getList(), odsTableName));
+                    if (StringUtils.isNotBlank(oldOdsDatabase)) {
+                        sqlInfo.setOldOdsToOldSql(odsToOdsSqlService.setOldOdsToOdsSql(result.getList(), odsPrefix, odsTableName, oldOdsPrefix, oldOdsDatabase, tableSysnWay));
                     }
-                } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)){
-                    dwdTableNameF = SystemConstant.DIM + suffixName.toString();
-                    dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
-                } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)){
-                    dwdTableNameF = SystemConstant.DIM + suffixName.toString();
-                    dwdTableNameCnF = SystemConstant.DIM_UP + odsTableNameCn.substring(3);
+                    list.add(sqlInfo);
                 }
-                greenTableName = StringUtils.isEmpty(gatherImportInfo.getGreenTableName()) ? dwdTableNameF : gatherImportInfo.getGreenTableName();
-                greenTableNameCn = StringUtils.isEmpty(gatherImportInfo.getGreenTableNameCn()) ? dwdTableNameCnF : gatherImportInfo.getGreenTableNameCn();
-                sqlInfo.setDwdZipperTableName(dwdTableNameF);
-                sqlInfo.setDwdAddTableName(dwdTableNameI);
-                sqlInfo.setTableName(odsTableName);
-                sqlInfo.setTableNameCn(odsTableNameCn);
-                sqlInfo.setSysCode(dwdSysCode);
-                sqlInfo.setBelongTo(belongTo);
-                sqlInfo.setSqlZipperGreenplumName(greenTableName);
-                sqlInfo.setOdsSql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.ODS));
-                sqlInfo.setOdsSqlMysql(tableSqlService.setSql(result.getList(), odsTableName, odsTableNameCn, SystemConstant.NOR_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.ODS));
-                if (SystemConstant.FACT_TABLE.equals(tableType)) {
-                    sqlInfo.setDwdSqlAdd(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
-                    sqlInfo.setDwdSqlAddMysql(tableSqlService.setSql(result.getList(), dwdTableNameI, dwdTableNameCnI, SystemConstant.ADD_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                } else if (SystemConstant.DIMENSION_TABLE.equals(tableType)){
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                } else if (SystemConstant.DICTIONARY_TABLE.equals(tableType)) {
-                    sqlInfo.setOdsToDwdInitSql(odsToDwdSqlService.setOdsToDwdInitSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                    sqlInfo.setOdsToDwdSql(odsToDwdSqlService.setOdsToDwdSql(result.getList(), odsTableName, dwdTableNameI, dwdTableNameF, odsPrefix, createTimes, updateTimes, tableType, tableSysnWay, dwdPrefix));
-                }
-                sqlInfo.setDwdSqlZipper(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MAX_COMPUTE, SystemConstant.DWD));
-                sqlInfo.setDwdSqlZipperMysql(tableSqlService.setSql(result.getList(), dwdTableNameF, dwdTableNameCnF, SystemConstant.ZIPPER_TYPE, SystemConstant.MYSQL_TYPE, SystemConstant.DWD));
-                sqlInfo.setSqlZipperGreenplum(tableSqlService.setGreenplumSql(result.getList(), greenTableName, greenTableNameCn));
-                sqlInfo.setOdsTestSql(odsTestSqlService.setOdsTestSql(result.getList(), odsTableName));
-                if (StringUtils.isNotBlank(oldOdsDatabase)) {
-                    sqlInfo.setOldOdsToOldSql(odsToOdsSqlService.setOldOdsToOdsSql(result.getList(), odsPrefix, odsTableName, oldOdsPrefix, oldOdsDatabase, tableSysnWay));
-                }
-                list.add(sqlInfo);
+                index++;
             }
-            index++;
+        } catch (Exception e) {
+            throw new Exception("第" + index + "sheet页报错：" + e.getMessage());
         }
         return list;
     }
