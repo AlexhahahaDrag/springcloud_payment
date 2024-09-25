@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 public class SqlInfo {
 
     @ApiModelProperty(value = "id", name = "id", example = "1")
-    @TableId(type = IdType.AUTO)
-    private Integer id;
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
 
     @ApiModelProperty(value = "tableName", name = "表名", example = "ods_table_name")
     @TableField(value = "table_name")

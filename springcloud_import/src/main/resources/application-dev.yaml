@@ -5,7 +5,7 @@ spring:
   application:
     name: import_module
   datasource:
-    url: jdbc:postgresql://10.10.30.248:5432/water_cq?currentSchema=dataworks_sql
+    url: jdbc:postgresql://10.10.30.199:5432/water?currentSchema=dataworks_sql
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver

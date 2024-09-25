@@ -20,7 +20,7 @@ import java.util.List;
 public class GpSqlInfo {
 
     @ApiModelProperty(value = "id", name = "id", example = "1")
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Integer id;
 
     @ApiModelProperty(value = "tableName", name = "表名", example = "ods_table_name")
