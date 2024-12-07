@@ -12,7 +12,7 @@
     <artifactId>springcloud_shiro</artifactId>
 
     <properties>
-        <shiro-spring.version>1.7.0</shiro-spring.version>
+        <shiro-spring.version>1.7.1</shiro-spring.version>
         <java-jwt.version>3.11.0</java-jwt.version>
     </properties>
     <dependencies>
